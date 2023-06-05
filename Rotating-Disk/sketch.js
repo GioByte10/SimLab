@@ -9,6 +9,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     angleMode(DEGREES);
     frameRate(60);
+    pixelDensity(1);
     noFill();
 }
 

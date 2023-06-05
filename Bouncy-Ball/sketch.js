@@ -8,6 +8,8 @@ let crx = 1;
 function setup() {
     createCanvas(windowWidth, windowHeight);
     ball = new Ball(width / 2, height / 2, 20);
+    frameRate(60);
+    pixelDensity(1);
 }
 
 function draw() {

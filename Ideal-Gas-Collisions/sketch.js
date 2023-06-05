@@ -10,6 +10,7 @@ let m = 1;          // yoctograms
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
+    pixelDensity(1);
 }
 
 function draw() {
