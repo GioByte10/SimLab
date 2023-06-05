@@ -1,16 +1,46 @@
-let fps = 60;
+const fps = 60;
 let cr = 1;
-let r = 20;
-let collisionFrames = 15;
+const r = 20;
+const collisionFrames = 15;
+let n = 1;
+let MAX_N = 50;
 
 let particles = [];
-let v = 200;
-let m = 1;          // yoctograms
+const v = 200;
+const m = 1;          // yoctograms
+
+let checkRedWhenCollide;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
     pixelDensity(1);
+
+    checkRedWhenCollide = createCheckbox('Red when collide', true);
+    checkRedWhenCollide.position(15, 100);
+    checkRedWhenCollide.style('color', '#646464');
+    checkRedWhenCollide.style('font-family', 'Helvetica, serif');
+    checkRedWhenCollide.style('-webkit-user-select', 'none');
+    checkRedWhenCollide.style('-ms-user-select', 'none');
+    checkRedWhenCollide.style('user-select', 'none');
+
+}
+
+function staticSetup(){
+    fill(150);
+    textSize(20);
+    textAlign(LEFT);
+    text(n, mouseX + 7, mouseY + 1);
+
+    fill(100);
+    textSize(17);
+    const instructions = [
+        'Click: add a particle',
+        'Scroll: change the number of particles',
+        'C: clear the screen',
+    ]
+    for(let i = 0; i < instructions.length; i++)
+        text(instructions[i], 15, 8 + 22 * (i + 1));
 }
 
 function draw() {
@@ -23,7 +53,11 @@ function draw() {
 
         particles[i].update();
     }
+    systemEnergy();
+    staticSetup();
+}
 
+function systemEnergy(){
     let systemEnergy = 0;
     for (let i = 0; i < particles.length; i++)
         systemEnergy += (particles[i].m * particles[i].v.magSq()) / 2;
@@ -48,7 +82,7 @@ class Particle {
     }
 
     update() {
-        if(this.collided){
+        if(this.collided && checkRedWhenCollide.checked()){
             if(frameCount - this.collisionFrame >= collisionFrames)
                 this.collided = false;
 
@@ -110,12 +144,18 @@ class Particle {
 }
 
 function mouseClicked() {
-    let vx = random(-v, v);
-    for(let i = 0; i < particles.length; i++)
-        if(particles[i].checkCollision(new Particle(mouseX, mouseY, vx, 0, r, m)))
-            return;
+    console.log(checkRedWhenCollide.position().x)
+    if(!(mouseX >= checkRedWhenCollide.position().x - 15 && mouseX <= checkRedWhenCollide.position().x + 150 && mouseY >= checkRedWhenCollide.position().y - 15 && mouseY <= checkRedWhenCollide.position().y + 15))
+        for(let i = 0; i < n; i++) {
+            let vx = random(-v, v);
+            particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m));
+        }
+}
 
-    particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m));
+function mouseWheel(event) {
+    if(abs(event.deltaY) > 0)
+        n -= abs(event.deltaY) / event.deltaY;
+    n = constrain(n, 1, MAX_N)
 }
 
 function keyPressed() {
