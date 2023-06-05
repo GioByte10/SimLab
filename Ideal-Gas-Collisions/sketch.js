@@ -4,7 +4,6 @@ let r = 20;
 let collisionFrames = 15;
 
 let particles = [];
-let n = 10;
 let v = 200;
 let m = 1;          // yoctograms
 
@@ -63,11 +62,15 @@ class Particle {
         if (this.p.x + this.radius > width || this.p.x - this.radius < 0) {
             this.v.x *= -1 * cr;
             this.p.x = constrain(this.p.x, this.radius, width - this.radius);
+            this.collided = true;
+            this.collisionFrame = frameCount;
         }
 
         if (this.p.y + this.radius > height || this.p.y - this.radius < 0) {
             this.v.y *= -1 * cr;
             this.p.y = constrain(this.p.y, this.radius, height - this.radius);
+            this.collided = true;
+            this.collisionFrame = frameCount;
         }
     }
 
