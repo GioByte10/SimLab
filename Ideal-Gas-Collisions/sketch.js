@@ -10,9 +10,6 @@ let m = 1;          // yoctograms
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
-    //particles.push(new Particle(100, 500, 100, 0, 20, 1))
-    //particles.push(new Particle(800, 500, -100, 0, 20, 1))
-
 }
 
 function draw() {
@@ -29,10 +26,11 @@ function draw() {
     let systemEnergy = 0;
     for (let i = 0; i < particles.length; i++)
         systemEnergy += (particles[i].m * particles[i].v.magSq()) / 2;
+    systemEnergy /= 1000;
 
     textAlign(CENTER);
     textSize(32);
-    text(round(systemEnergy).toString()+ " yJ", width - 100, 50);
+    text(round(systemEnergy).toString()+ " zJ", width - 100, 50);
 }
 
 class Particle {
@@ -42,10 +40,23 @@ class Particle {
 
         this.m = m;
         this.radius = radius;
+
+        this.collided = false
+        this.collisionFrame = 0;
     }
 
     update() {
+        if(this.collided){
+            if(frameCount - this.collisionFrame >= 15)
+                this.collided = false;
+            else {
+                push();
+                fill(255, 200 * (frameCount - this.collisionFrame) / 15 + 55, 200 * (frameCount - this.collisionFrame) / 15 + 55);
+            }
+        }
         circle(this.p.x, this.p.y, this.radius * 2);
+        pop();
+
         this.p.add(this.v.copy().mult(1 / fps));
 
         if (this.p.x + this.radius > width || this.p.x - this.radius < 0) {
@@ -69,6 +80,8 @@ class Particle {
 
     }
 
+    // https://www.vobarian.com/collisions/2dcollisions2.pdf
+    // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
     collide(particle) {
         let scalar;
         let dv = this.v.copy().sub(particle.v);
@@ -81,6 +94,11 @@ class Particle {
         dp.mult(-1);
         particle.v.sub(dp.copy().mult(scalar));
 
+        this.collided = true;
+        particle.collided = true;
+
+        this.collisionFrame = frameCount;
+        particle.collisionFrame = frameCount;
     }
 }
 
