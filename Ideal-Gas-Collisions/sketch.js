@@ -59,50 +59,28 @@ class Particle {
         }
     }
     checkCollision(particle) {
-        if(this.p.dist(particle.p) <= this.radius + particle.radius)
-            return true;
+        if(this.p.dist(particle.p) >=  this.radius + particle.radius)
+            return false;
+
+        let dp = this.p.copy().sub(particle.p);
+        let dv = this.v.copy().sub(particle.v);
+        let db = dv.dot(dp);
+        return db < 0;
+
     }
 
     collide(particle) {
         let scalar;
-        let deltaV = this.v.copy().sub(particle.v);
-        let deltaP = this.p.copy().sub(particle.p);
+        let dv = this.v.copy().sub(particle.v);
+        let dp = this.p.copy().sub(particle.p);
 
-        scalar = ((2 * particle.m) / (this.m + particle.m)) * (deltaV.dot(deltaP) / deltaP.magSq());
-        this.v.sub(deltaP.copy().mult(scalar));
+        scalar = ((2 * particle.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
+        this.v.sub(dp.copy().mult(scalar));
 
-        scalar = ((2 * this.m) / (this.m + particle.m)) * (deltaV.dot(deltaP) / deltaP.magSq());
-        deltaP.mult(-1);
-        particle.v.sub(deltaP.copy().mult(scalar));
+        scalar = ((2 * this.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
+        dp.mult(-1);
+        particle.v.sub(dp.copy().mult(scalar));
 
-        let u = particle.p.copy().sub(this.p);
-
-        if(u.mag() < this.radius + particle.radius){
-            let dp = createVector((abs(u.x) - 40) * u.copy().normalize().x, (abs(u.y) - 40) * u.copy().normalize().y);
-
-            if(u.x > 0)
-                dp.x *= abs(u.x) / u.x;
-
-            if(u.y > 0)
-                dp.y *= abs(u.y) / u.y;
-
-
-            console.log("hey" + dp.toString());
-            console.log(this.p.toString());
-            console.log(particle.p.toString());
-
-            this.p.x += 0.5 * dp.x;
-            this.p.y += 0.5 * dp.y;
-
-            dp.mult(-1);
-            particle.p.x += 0.5 * dp.x;
-            particle.p.y += 0.5 * dp.y;
-            // particle.p.x += (particle.v.x / (this.v.x + particle.v.x)) * u.x;
-            // particle.p.y += (particle.v.y / (this.v.y + particle.v.y)) * u.y;
-            console.log(this.p.toString());
-            console.log(particle.p.toString());
-            //remove();
-        }
     }
 }
 
