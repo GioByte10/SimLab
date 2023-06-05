@@ -70,6 +70,8 @@ class Particle {
             this.p.y = constrain(this.p.y, this.radius, height - this.radius);
         }
     }
+
+    // https://math.stackexchange.com/q/1438040
     checkCollision(particle) {
         if(this.p.dist(particle.p) >=  this.radius + particle.radius)
             return false;
