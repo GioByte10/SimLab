@@ -10,8 +10,8 @@ let m = 1;          // yoctograms
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
-    particles.push(new Particle(100, 500, 100, 0, 20, 1))
-    particles.push(new Particle(800, 500, -100, 0, 20, 1))
+    //particles.push(new Particle(100, 500, 100, 0, 20, 1))
+    //particles.push(new Particle(800, 500, -100, 0, 20, 1))
 
 }
 
