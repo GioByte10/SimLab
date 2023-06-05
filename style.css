@@ -1,0 +1,22 @@
+body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    position:relative;
+    left:20px;
+    font-family: "Calibri Light", serif;
+}
+
+body{
+    background-color: #DCDCDC;
+}
+
+a{
+    position:relative;
+    top:10px;
+    left:40px;
+    font-family: "Calibri Light", serif;
+}
