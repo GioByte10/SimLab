@@ -1,6 +1,7 @@
 let fps = 60;
 let cr = 1;
 let r = 20;
+let collisionFrames = 15;
 
 let particles = [];
 let n = 10;
@@ -28,6 +29,7 @@ function draw() {
         systemEnergy += (particles[i].m * particles[i].v.magSq()) / 2;
     systemEnergy /= 1000;
 
+    fill(0);
     textAlign(CENTER);
     textSize(32);
     text(round(systemEnergy).toString()+ " zJ", width - 100, 50);
@@ -47,16 +49,15 @@ class Particle {
 
     update() {
         if(this.collided){
-            if(frameCount - this.collisionFrame >= 15)
+            if(frameCount - this.collisionFrame >= collisionFrames)
                 this.collided = false;
-            else {
-                push();
-                fill(255, 200 * (frameCount - this.collisionFrame) / 15 + 55, 200 * (frameCount - this.collisionFrame) / 15 + 55);
-            }
-        }
-        circle(this.p.x, this.p.y, this.radius * 2);
-        pop();
 
+            fill(255, 150 * (frameCount - this.collisionFrame) / collisionFrames + 105, 150 * (frameCount - this.collisionFrame) / collisionFrames + 105);
+
+        }else
+            fill(255, 255, 255);
+
+        circle(this.p.x, this.p.y, this.radius * 2);
         this.p.add(this.v.copy().mult(1 / fps));
 
         if (this.p.x + this.radius > width || this.p.x - this.radius < 0) {
