@@ -16,8 +16,9 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
 
-    // if(height > width)
-    //     pixelDensity(1);
+    if(navigator.platform === 'Android' || navigator.platform === 'iPhone' || navigator.platform === 'iPad' || navigator.platform === 'iPod')
+        pixelDensity(1);
+
 
     checkRedWhenCollide = createCheckbox('Red when collide', true);
     checkRedWhenCollide.position(15, 120);
