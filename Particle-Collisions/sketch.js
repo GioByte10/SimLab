@@ -188,7 +188,7 @@ class Particle {
     }
 }
 
-function mouseClicked() {
+function touchStarted() {
     if(mouseX >= 300 || mouseY >= 200)
         for(let i = 0; i < n; i++) {
             if(!checkRandom.checked()) {
@@ -199,6 +199,7 @@ function mouseClicked() {
                 particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
             }
         }
+    return false;
 }
 
 function mouseWheel(event) {
