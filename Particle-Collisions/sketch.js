@@ -7,8 +7,11 @@ let MAX_N = 50;
 
 let particles = [];
 const v = 200;
+const MAX_R = 50;
+let c;
 const m = 1;          // yoctograms
 
+let checkRandom;
 let checkRedWhenCollide;
 let sliderCr;
 
@@ -16,12 +19,21 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
 
+    c = 1 / (PI * 400);
+
     if(navigator.platform === 'Android' || navigator.platform === 'iPhone' || navigator.platform === 'iPad' || navigator.platform === 'iPod')
         pixelDensity(1);
 
+    checkRandom = createCheckbox('Random particles', false);
+    checkRandom.position(12, 115);
+    checkRandom.style('font-family', 'Helvetica, serif');
+    checkRandom.style('color', '#646464');
+    checkRandom.style('-webkit-user-select', 'none');
+    checkRandom.style('-ms-user-select', 'none');
+    checkRandom.style('user-select', 'none');
 
     checkRedWhenCollide = createCheckbox('Red when collide', true);
-    checkRedWhenCollide.position(15, 120);
+    checkRedWhenCollide.position(12, 140);
     checkRedWhenCollide.style('color', '#646464');
     checkRedWhenCollide.style('font-family', 'Helvetica, serif');
     checkRedWhenCollide.style('-webkit-user-select', 'none');
@@ -83,26 +95,30 @@ function systemEnergy(){
 }
 
 class Particle {
-    constructor(x, y, vx, vy, radius, m) {
+    constructor(x, y, vx, vy, radius, m, color) {
         this.p = createVector(x, y);
         this.v = createVector(vx, vy);
 
         this.m = m;
         this.radius = radius;
 
+        this.color = color;
+
         this.collided = false
         this.collisionFrame = 0;
     }
 
     update() {
+
+        let df = frameCount - this.collisionFrame
         if(this.collided && checkRedWhenCollide.checked()){
-            if(frameCount - this.collisionFrame >= collisionFrames)
+            if(df >= collisionFrames)
                 this.collided = false;
 
-            fill(255, 150 * (frameCount - this.collisionFrame) / collisionFrames + 105, 150 * (frameCount - this.collisionFrame) / collisionFrames + 105);
+            fill(df * (this.color.levels[0] - 255) / collisionFrames + 255, df * (this.color.levels[1] - 105) / collisionFrames + 105, df * (this.color.levels[2] - 105) / collisionFrames + 105);
 
         }else
-            fill(255, 255, 255);
+            fill(this.color);
 
         circle(this.p.x, this.p.y, this.radius * 2);
         this.p.add(this.v.copy().mult(1 / fps));
@@ -159,8 +175,13 @@ class Particle {
 function mouseClicked() {
     if(mouseX >= 300 || mouseY >= 150)
         for(let i = 0; i < n; i++) {
-            let vx = random(-v, v);
-            particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m));
+            if(!checkRandom.checked()) {
+                let vx = random(-v, v);
+                particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(255, 255, 255)));
+            }else {
+                let lr = random(5, MAX_R);
+                particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
+            }
         }
 }
 
