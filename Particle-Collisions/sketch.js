@@ -16,8 +16,8 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
 
-    if(height > width)
-        pixelDensity(1);
+    // if(height > width)
+    //     pixelDensity(1);
 
     checkRedWhenCollide = createCheckbox('Red when collide', true);
     checkRedWhenCollide.position(15, 120);
