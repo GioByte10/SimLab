@@ -1,5 +1,5 @@
 const fps = 60;
-let cr = 1;
+let cr;
 const r = 20;
 const collisionFrames = 15;
 let n = 1;
@@ -10,19 +10,25 @@ const v = 200;
 const m = 1;          // yoctograms
 
 let checkRedWhenCollide;
+let sliderCr;
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
-    pixelDensity(1);
+    //pixelDensity(1);
 
     checkRedWhenCollide = createCheckbox('Red when collide', true);
-    checkRedWhenCollide.position(15, 100);
+    checkRedWhenCollide.position(15, 120);
     checkRedWhenCollide.style('color', '#646464');
     checkRedWhenCollide.style('font-family', 'Helvetica, serif');
     checkRedWhenCollide.style('-webkit-user-select', 'none');
     checkRedWhenCollide.style('-ms-user-select', 'none');
     checkRedWhenCollide.style('user-select', 'none');
+
+    sliderCr = createSlider(0, 1, 1, 0.01);
+    sliderCr.position(82, 88);
+    sliderCr.style('-webkit-appearance', 'none');
+    sliderCr.style('opacity', '0.4');
 
 }
 
@@ -36,15 +42,18 @@ function staticSetup(){
     textSize(17);
     const instructions = [
         'Click: add a particle',
-        'Scroll: change the number of particles',
+        'Scroll: change particles / click',
         'C: clear the screen',
     ]
     for(let i = 0; i < instructions.length; i++)
         text(instructions[i], 15, 8 + 22 * (i + 1));
+
+    text("e = " + cr, 15, 100);
 }
 
 function draw() {
     background(220);
+    cr = sliderCr.value();
 
     for (let i = 0; i < particles.length; i++){
         for(let j = i + 1; j < particles.length; j++)
@@ -64,9 +73,10 @@ function systemEnergy(){
     systemEnergy /= 1000;
 
     fill(0);
-    textAlign(CENTER);
+    textAlign(RIGHT);
     textSize(32);
-    text(round(systemEnergy).toString()+ " zJ", width - 100, 50);
+    text(round(systemEnergy).toString()+ " zJ", width - 20, 40);
+    text(particles.length.toString() + " p", width - 20, 80);
 }
 
 class Particle {
@@ -111,7 +121,7 @@ class Particle {
 
     // https://math.stackexchange.com/q/1438040
     checkCollision(particle) {
-        if(this.p.dist(particle.p) >=  this.radius + particle.radius)
+        if(this.p.dist(particle.p) >  this.radius + particle.radius)
             return false;
 
         let dp = this.p.copy().sub(particle.p);
@@ -128,10 +138,10 @@ class Particle {
         let dv = this.v.copy().sub(particle.v);
         let dp = this.p.copy().sub(particle.p);
 
-        scalar = ((2 * particle.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
+        scalar = (((1 + cr) * particle.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
         this.v.sub(dp.copy().mult(scalar));
 
-        scalar = ((2 * this.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
+        scalar = (((1 + cr) * this.m) / (this.m + particle.m)) * (dv.dot(dp) / dp.magSq());
         dp.mult(-1);
         particle.v.sub(dp.copy().mult(scalar));
 
@@ -144,8 +154,7 @@ class Particle {
 }
 
 function mouseClicked() {
-    console.log(checkRedWhenCollide.position().x)
-    if(!(mouseX >= checkRedWhenCollide.position().x - 15 && mouseX <= checkRedWhenCollide.position().x + 150 && mouseY >= checkRedWhenCollide.position().y - 15 && mouseY <= checkRedWhenCollide.position().y + 15))
+    if(mouseX >= 300 || mouseY >= 150)
         for(let i = 0; i < n; i++) {
             let vx = random(-v, v);
             particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m));
