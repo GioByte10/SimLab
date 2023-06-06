@@ -12,6 +12,7 @@ let c;
 const m = 1;          // yoctograms
 
 let checkRandom;
+let checkRandomColor;
 let checkRedWhenCollide;
 let sliderCr;
 
@@ -32,8 +33,16 @@ function setup() {
     checkRandom.style('-ms-user-select', 'none');
     checkRandom.style('user-select', 'none');
 
+    checkRandomColor = createCheckbox('Random color', true);
+    checkRandomColor.position(12, 140);
+    checkRandomColor.style('font-family', 'Helvetica, serif');
+    checkRandomColor.style('color', '#646464');
+    checkRandomColor.style('-webkit-user-select', 'none');
+    checkRandomColor.style('-ms-user-select', 'none');
+    checkRandomColor.style('user-select', 'none');
+
     checkRedWhenCollide = createCheckbox('Red when collide', true);
-    checkRedWhenCollide.position(12, 140);
+    checkRedWhenCollide.position(12, 165);
     checkRedWhenCollide.style('color', '#646464');
     checkRedWhenCollide.style('font-family', 'Helvetica, serif');
     checkRedWhenCollide.style('-webkit-user-select', 'none');
@@ -110,15 +119,21 @@ class Particle {
 
     update() {
 
+        let c;
+        if(!checkRandomColor.checked())
+            c = color(255, 255, 255);
+        else
+            c = this.color;
+
         let df = frameCount - this.collisionFrame
         if(this.collided && checkRedWhenCollide.checked()){
             if(df >= collisionFrames)
                 this.collided = false;
 
-            fill(df * (this.color.levels[0] - 255) / collisionFrames + 255, df * (this.color.levels[1] - 105) / collisionFrames + 105, df * (this.color.levels[2] - 105) / collisionFrames + 105);
+            fill(df * (c.levels[0] - 255) / collisionFrames + 255, df * (c.levels[1] - 105) / collisionFrames + 105, df * (c.levels[2] - 105) / collisionFrames + 105);
 
         }else
-            fill(this.color);
+            fill(c);
 
         circle(this.p.x, this.p.y, this.radius * 2);
         this.p.add(this.v.copy().mult(1 / fps));
@@ -173,11 +188,11 @@ class Particle {
 }
 
 function mouseClicked() {
-    if(mouseX >= 300 || mouseY >= 150)
+    if(mouseX >= 300 || mouseY >= 200)
         for(let i = 0; i < n; i++) {
             if(!checkRandom.checked()) {
                 let vx = random(-v, v);
-                particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(255, 255, 255)));
+                particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
             }else {
                 let lr = random(5, MAX_R);
                 particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
