@@ -73,7 +73,7 @@ function staticSetup(){
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
     text("e = " + cr, 15, 100);
-    text(navigator.platform, width - 150, height - 30);
+    text(navigator.platform, width / 2, height / 2);
 }
 
 function draw() {
