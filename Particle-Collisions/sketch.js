@@ -15,7 +15,9 @@ let sliderCr;
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
-    //pixelDensity(1);
+
+    if(height > width)
+        pixelDensity(1);
 
     checkRedWhenCollide = createCheckbox('Red when collide', true);
     checkRedWhenCollide.position(15, 120);
