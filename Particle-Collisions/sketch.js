@@ -167,6 +167,7 @@ class Particle {
 
     // https://www.vobarian.com/collisions/2dcollisions2.pdf
     // https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional
+    // https://physics.stackexchange.com/q/732180
     collide(particle) {
         let scalar;
         let dv = this.v.copy().sub(particle.v);
