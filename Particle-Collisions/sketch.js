@@ -22,7 +22,7 @@ function setup() {
 
     c = 1 / (PI * 400);
 
-    if(navigator.platform === 'Android' || navigator.platform === 'iPhone' || navigator.platform === 'iPad' || navigator.platform === 'iPod')
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
     checkRandom = createCheckbox('Random particles', false);
@@ -73,7 +73,6 @@ function staticSetup(){
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
     text("e = " + cr, 15, 100);
-    text(navigator.platform, width / 2, height / 2);
 }
 
 function draw() {
