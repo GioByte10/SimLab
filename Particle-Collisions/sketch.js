@@ -189,18 +189,32 @@ class Particle {
 }
 
 function touchStarted() {
-    if(mouseX >= 300 || mouseY >= 200)
-        for(let i = 0; i < n; i++) {
-            if(!checkRandom.checked()) {
+    if(mouseX >= 300 || mouseY >= 200) {
+        for (let i = 0; i < n; i++) {
+            if (!checkRandom.checked()) {
                 let vx = random(-v, v);
                 particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
-            }else {
+            } else {
                 let lr = random(5, MAX_R);
                 particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
             }
         }
-    return false;
+        return false;
+    }
 }
+
+// function mouseClicked() {
+//     if(mouseX >= 300 || mouseY >= 200)
+//         for(let i = 0; i < n; i++) {
+//             if(!checkRandom.checked()) {
+//                 let vx = random(-v, v);
+//                 particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
+//             }else {
+//                 let lr = random(5, MAX_R);
+//                 particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
+//             }
+//         }
+// }
 
 function mouseWheel(event) {
     if(abs(event.deltaY) > 0)

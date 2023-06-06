@@ -20,3 +20,17 @@ a{
     left:40px;
     font-family: "Calibri Light", serif;
 }
+
+.footnotep{
+    position:absolute;
+    bottom:5px;
+    right:25px;
+    font-family: "Calibri Light", serif;
+}
+
+.footnotea{
+    position:absolute;
+    bottom:5px;
+    right:25px;
+    font-family: "Calibri Light", serif;
+}
