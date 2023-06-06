@@ -25,7 +25,7 @@ function setup() {
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
-    checkRandom = createCheckbox('Random particles', false);
+    checkRandom = createCheckbox('Different types of particles', true);
     checkRandom.position(12, 115);
     checkRandom.style('font-family', 'Helvetica, serif');
     checkRandom.style('color', '#646464');
