@@ -30,16 +30,18 @@ function setup() {
         mobile = true;
     }
 
-    if(!mobile)
+    if(!mobile) {
         instructions = [
             'Click: add a particle',
             'Scroll: change particles / click',
             'C: clear the screen',
         ];
-    else
+    }else {
         instructions = [
             'Tap: add a particle',
-            ];
+        ];
+        createClearButton();
+    }
 
     checkRandom = createCheckbox('Different types of particles', true);
     checkRandom.position(12, 115);
@@ -210,16 +212,21 @@ class Particle {
 
 function touchStarted() {
     if(mouseX >= 300 || mouseY >= 200) {
-        for (let i = 0; i < n; i++) {
-            if (!checkRandom.checked()) {
-                let vx = random(-v, v);
-                particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
-            } else {
-                let lr = random(4, MAX_R);
-                particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
+        if(mobile && mouseX >= width - 80 && mouseX <= width - 10 && mouseY >= height - 55 && mouseY <= height - 15) {
+            particles = [];
+
+        }else {
+            for (let i = 0; i < n; i++) {
+                if (!checkRandom.checked()) {
+                    let vx = random(-v, v);
+                    particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
+                } else {
+                    let lr = random(4, MAX_R);
+                    particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
+                }
             }
+            return false;
         }
-        return false;
     }
 }
 
@@ -232,4 +239,40 @@ function mouseWheel(event) {
 function keyPressed() {
     if (keyCode === 67)
         particles = [];
+}
+
+function createClearButton(){
+
+    let clearButton = createButton("Clear");
+
+    clearButton.style("background-color", "#EA6157");
+    clearButton.style("border-radius", "8px");
+    clearButton.style("border-style", "none");
+    clearButton.style("box-sizing", "border-box");
+    clearButton.style("color", "#FFFFFF");
+    clearButton.style("cursor", "pointer");
+    clearButton.style("display", "inline-block");
+    clearButton.style("font-family", "Haas Grot Text R Web, Helvetica Neue, Helvetica, Arial, sans-serif");
+    clearButton.style("font-size", "14px");
+    clearButton.style("font-weight", "500");
+    clearButton.style("height", "40px");
+    clearButton.style("line-height", "20px");
+    clearButton.style("list-style", "none");
+    clearButton.style("margin", "0");
+    clearButton.style("outline", "none");
+    clearButton.style("padding", "10px 16px");
+    clearButton.style("position", "relative");
+    clearButton.style("text-align", "center");
+    clearButton.style("text-decoration", "none");
+    clearButton.style("transition", "color 100ms");
+    clearButton.style("vertical-align", "baseline");
+    clearButton.style("user-select", "none");
+    clearButton.style("-webkit-user-select", "none");
+    clearButton.style("touch-action", "manipulation");
+
+    // Apply hover and focus styles
+    clearButton.style("background-color", "#EA6157", ":hover");
+    clearButton.style("background-color", "#EA6157", ":focus");
+
+    clearButton.position(width - 80, height - 55);
 }
