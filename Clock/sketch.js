@@ -10,6 +10,7 @@ let now = new Date();
 let chd = now.getHours();
 let cmd = now.getMinutes() + now.getSeconds() / 60;
 
+let mobile = false;
 
 let angle;
 
@@ -21,8 +22,12 @@ function setup() {
 
     r = min(width, height) / 3.5;
 
+    if(navigator.userAgent.match(/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/i))
+        mobile = true;
+
     if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
         pixelDensity(1);
+
 
     angle = cmd * 6 + chd * 360;
 
@@ -126,10 +131,14 @@ function createButtons(){
     cw.style("background-color", "#4CAF50", ":focus");
 
     cw.position(width / 2 + r + 20, height / 2 - 10);
-    cw.mousePressed(forward);
-    cw.mouseReleased(stop);
 
-
+    if(mobile){
+        cw.touchStarted(forward);
+        cw.touchEnded(stop);
+    }else{
+        cw.mousePressed(forward);
+        cw.mouseReleased(stop);
+    }
 
     let ccw = createButton("R");
 
@@ -163,8 +172,14 @@ function createButtons(){
     ccw.style("background-color", "#EA6157", ":focus");
 
     ccw.position(width / 2 + r + 20, height / 2 + 50);
-    ccw.mousePressed(rev);
-    ccw.mouseReleased(stop);
+
+    if(mobile){
+        ccw.touchStarted(rev);
+        ccw.touchEnded(stop);
+    }else {
+        ccw.mousePressed(rev);
+        ccw.mouseReleased(stop);
+    }
 
 }
 
