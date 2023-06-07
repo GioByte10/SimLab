@@ -45,7 +45,7 @@ function draw() {
     line(0, 0, r / 2, 0);
     pop();
 
-    text(floor(angle).toString() + '°', -210, 210);
+    text(floor(angle).toString() + '°', -235, 210);
 
     if(!h)
         rotate(+90);
