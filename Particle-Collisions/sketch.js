@@ -16,14 +16,30 @@ let checkRandomColor;
 let checkRedWhenCollide;
 let sliderCr;
 
+let mobile = false;
+let instructions;
+
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(fps);
 
     c = 1 / (PI * 400);
 
-    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i)) {
         pixelDensity(1);
+        mobile = true;
+    }
+
+    if(!mobile)
+        instructions = [
+            'Click: add a particle',
+            'Scroll: change particles / click',
+            'C: clear the screen',
+        ];
+    else
+        instructions = [
+            'Tap: add a particle',
+            ];
 
     checkRandom = createCheckbox('Different types of particles', true);
     checkRandom.position(12, 115);
@@ -60,19 +76,18 @@ function staticSetup(){
     fill(150);
     textSize(20);
     textAlign(LEFT);
-    text(n, mouseX + 7, mouseY + 1);
+
+    if(!mobile)
+        text(n, mouseX + 7, mouseY + 1);
 
     fill(100);
     textSize(17);
-    const instructions = [
-        'Click: add a particle',
-        'Scroll: change particles / click',
-        'C: clear the screen',
-    ]
-    for(let i = 0; i < instructions.length; i++)
+
+    let i;
+    for(i = 0; i < instructions.length; i++)
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
-    text("e = " + cr, 15, 100);
+    text("e = " + cr, 15, 8 + 22 * (i + 1) + 4);
 
     if(particles.length === 0) {
         textAlign(CENTER);
