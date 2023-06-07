@@ -24,7 +24,7 @@ function setup() {
     frameRate(fps);
 
     c = 1 / (PI * 400);
-
+    
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i)) {
         pixelDensity(1);
         mobile = true;
