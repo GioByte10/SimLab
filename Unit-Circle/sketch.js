@@ -5,6 +5,7 @@ let r = 400;
 let lineOffset = 50;
 let l = 500;
 let m;
+let h = false;
 
 let sinArray = [];
 
@@ -20,19 +21,25 @@ function setup() {
     background(220);
     textSize(18);
 
+    if(m === height)
+        h = true;
 }
 
 function draw() {
 
     background(220);
-    if(m === height)
+    if(h)
         translate(width/2 - 270, height/2);
     else
         translate(width/2, height/2 + 175);
     strokeWeight(2);
 
     push();
-    rotate(-angle);
+    if(h)
+        rotate(-angle);
+    else
+        rotate(-(angle + 90));
+
     fill(220);
     circle(0, 0, r);
     line(0, 0, r / 2, 0);
