@@ -51,7 +51,7 @@ function draw() {
         rotate(-90);
 
     line(r/2 + lineOffset, -r/2, r/2 + lineOffset, r/2);
-    line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 160, 0);
+    line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 100, 0);
 
     strokeWeight(12);
     point(r/2 + lineOffset, r/2 * sin(-angle));
