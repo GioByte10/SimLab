@@ -7,30 +7,69 @@ body {
 h1 {
     position:relative;
     left:20px;
-    font-family: "Calibri Light", serif;
+    font-family: "Calibri Light", sans-serif;
 }
 
 body{
     background-color: #DCDCDC;
 }
 
-a{
+.link{
     position:relative;
+    left:35px;
     top:10px;
-    left:40px;
-    font-family: "Calibri Light", serif;
+    color: #002aff;
+    font-family: "Calibri", sans-serif;
+    font-size: 18px;
+}
+
+/*center align*/
+.footnotea{
+    position:absolute;
+    bottom:14px;
+    right:50px;
+    color: #000000;
+    text-align:center;
+    vertical-align: center;
+    font-family: "Calibri B", sans-serif;
+    font-size:16px
 }
 
 .footnotep{
     position:absolute;
-    bottom:5px;
-    right:25px;
-    font-family: "Calibri Light", serif;
+    bottom:2px;
+    width:100%;
+    text-align:center;
+    font-family: "Calibri", sans-serif;
+    font-size:14px
 }
 
-.footnotea{
+#footnoteImage{
     position:absolute;
-    bottom:5px;
-    right:25px;
-    font-family: "Calibri Light", serif;
+    bottom:10px;
+    right:10px;
+    width:30px;
+    height:30px;
 }
+
+a:link{
+    text-decoration: none;
+}
+
+a:visited{
+    text-decoration: none;
+}
+
+a:hover{
+    text-decoration: underline;
+}
+
+a:active{
+    text-decoration: underline;
+}
+
+.topdivider{
+    width:98%;
+}
+
+
