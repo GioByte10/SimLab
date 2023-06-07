@@ -31,7 +31,7 @@ function draw() {
     if(h)
         translate(width/2 - 270, height/2);
     else
-        translate(width/2, height/2 + 175);
+        translate(width/2, height/2 + 270);
     strokeWeight(2);
 
     push();
