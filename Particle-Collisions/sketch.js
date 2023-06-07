@@ -73,6 +73,11 @@ function staticSetup(){
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
     text("e = " + cr, 15, 100);
+
+    if(particles.length === 0) {
+        textAlign(CENTER);
+        text("Click to add a particle", width / 2, height / 2);
+    }
 }
 
 function draw() {
