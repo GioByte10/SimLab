@@ -195,14 +195,14 @@ function touchStarted() {
                 let vx = random(-v, v);
                 particles.push(new Particle(mouseX, mouseY, vx, random([-1, 1]) * sqrt(v ** 2 - vx ** 2), r, m, color(random(0, 255), random(0, 255), random(0, 255))));
             } else {
-                let lr = random(5, MAX_R);
+                let lr = random(4, MAX_R);
                 particles.push(new Particle(mouseX, mouseY, random(-v, v), random(-v, v), lr, PI * lr ** 2 * c, color(random(0, 255), random(0, 255), random(0, 255))));
             }
         }
         return false;
     }
 }
- 
+
 function mouseWheel(event) {
     if(abs(event.deltaY) > 0)
         n -= abs(event.deltaY) / event.deltaY;
