@@ -1,9 +1,9 @@
 let w = 1;
 let angle = 0;
 
-let r = 340;
+let r = 400;
 let lineOffset = 50;
-let l = 440;
+let l = 500;
 let m;
 
 let sinArray = [];
@@ -18,7 +18,7 @@ function setup() {
 
     m = min(width, height);
     background(220);
-
+    textSize(18);
 
 }
 
@@ -26,7 +26,7 @@ function draw() {
 
     background(220);
     if(m === height)
-        translate(width/2 - 175, height/2);
+        translate(width/2 - 270, height/2);
     else
         translate(width/2, height/2 - 175);
     strokeWeight(2);
@@ -38,13 +38,13 @@ function draw() {
     line(0, 0, r / 2, 0);
     pop();
 
-    text(floor(angle).toString() + '°', -200, 200);
+    text(floor(angle).toString() + '°', -210, 210);
 
     if(m === width)
         rotate(-90);
 
     line(r/2 + lineOffset, -r/2, r/2 + lineOffset, r/2);
-    line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 100, 0);
+    line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 160, 0);
 
     strokeWeight(12);
     point(r/2 + lineOffset, r/2 * sin(-angle));
@@ -69,7 +69,6 @@ function draw() {
 
     if(sinArray.length > l)
         sinArray.pop();
-
 
 }
 
