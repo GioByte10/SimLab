@@ -1,17 +1,14 @@
-body {
+html, body {
     overflow: hidden;
     margin: 0;
     padding: 0;
+    background-color: #DCDCDC;
 }
 
 h1 {
     position:relative;
     left:20px;
     font-family: "Calibri Light", sans-serif;
-}
-
-body{
-    background-color: #DCDCDC;
 }
 
 .link{

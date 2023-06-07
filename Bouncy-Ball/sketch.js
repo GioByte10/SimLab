@@ -10,6 +10,9 @@ function setup() {
     ball = new Ball(width / 2, height / 2 - 100, 20);
     frameRate(60);
     pixelDensity(1);
+
+    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+        pixelDensity(1);
 }
 
 function draw() {

@@ -22,7 +22,7 @@ function setup() {
 
     c = 1 / (PI * 400);
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
     checkRandom = createCheckbox('Different types of particles', true);
