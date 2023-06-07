@@ -28,7 +28,7 @@ function draw() {
     if(m === height)
         translate(width/2 - 175, height/2);
     else
-        translate(width/2, height/2 + 175);
+        translate(width/2, height/2 - 175);
     strokeWeight(2);
 
     push();
@@ -41,7 +41,7 @@ function draw() {
     text(floor(angle).toString() + '°', -200, 200);
 
     if(m === width)
-        rotate(90);
+        rotate(-90);
 
     line(r/2 + lineOffset, -r/2, r/2 + lineOffset, r/2);
     line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 100, 0);
@@ -51,11 +51,16 @@ function draw() {
     point(0, 0);
 
     textAlign(CENTER);
-
     strokeWeight(4);
 
     for(let i = 0; i < sinArray.length; i++)
         point(r/2 + lineOffset + i, sinArray[i] * r /2);
+
+    push();
+    strokeWeight(2);
+    setLineDash([7, 7]);
+    line(cos(angle) * r/2, -sin(angle) * r/2, r/2 + lineOffset, -sin(angle) * r/2)
+    pop();
 
     angle += w;
     angle %= 360
