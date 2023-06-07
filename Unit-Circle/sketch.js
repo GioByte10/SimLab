@@ -31,14 +31,14 @@ function draw() {
     if(h)
         translate(width/2 - 270, height/2);
     else
-        translate(width/2, height/2 + 270);
+        translate(width/2, height/2 - 270);
     strokeWeight(2);
 
     push();
     if(h)
         rotate(-angle);
     else
-        rotate(-(angle + 90));
+        rotate(-(angle - 90));
 
     fill(220);
     circle(0, 0, r);
@@ -48,7 +48,7 @@ function draw() {
     text(floor(angle).toString() + '°', -210, 210);
 
     if(!h)
-        rotate(-90);
+        rotate(+90);
 
     line(r/2 + lineOffset, -r/2, r/2 + lineOffset, r/2);
     line(r/2 + lineOffset, 0, 3/2 * r + lineOffset + 100, 0);
