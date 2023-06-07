@@ -1,2 +1,2 @@
 # SimLab
-Interactive simulations using P5 JS
+Interactive P5 JS simulations
