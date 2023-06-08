@@ -132,8 +132,13 @@ function createButtons(){
 
     cw.position(width / 2 + r + 20, height / 2 - 10);
 
-        cw.touchStarted(forward);
-        cw.touchEnded(stop);
+
+    cw.touchStarted(forward);
+    cw.touchEnded(stop);
+
+    cw.mousePressed(forward);
+    cw.mouseReleased(stop);
+
 
     let ccw = createButton("R");
 
@@ -168,8 +173,12 @@ function createButtons(){
 
     ccw.position(width / 2 + r + 20, height / 2 + 50);
 
-        ccw.touchStarted(rev);
-        ccw.touchEnded(stop);
+    ccw.touchStarted(rev);
+    ccw.touchEnded(stop);
+
+    ccw.mousePressed(rev);
+    ccw.mouseReleased(stop);
+
 }
 
 function forward(){
