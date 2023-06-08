@@ -34,7 +34,6 @@ let baArray = [];
 
 let t = 0;
 let hm = false;
-let c = false;
 
 function setup() {
 
@@ -44,10 +43,9 @@ function setup() {
 
     hm = width > height;
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i)) {
+    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
         pixelDensity(1);
-        c = true;
-    }
+
 
     w = createVector(0, 0, 0.012);
 
@@ -89,11 +87,6 @@ function draw() {
         translate(width - edgeOffset, height - edgeOffset);
         rotate(-PI/2);
     }
-
-    if(c){
-        text("____________", 300, -200);
-    }
-    text(navigator.userAgent, 700, -100);
 
     staticSetup();
 
@@ -150,7 +143,6 @@ function moveRelativeFrame(){
     line(0, 0, 0, -relativeAxisLength);
 
     moveOnRelativeFrame();
-
     pop();
 }
 
