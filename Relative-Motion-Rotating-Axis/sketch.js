@@ -20,7 +20,7 @@ let vAy0 = 0;
 let rrBA;
 let rrBA0;
 let rrBAx0 = 0;
-let rrBAy0 = 0;
+let rrBAy0 = 60;
 
 let rvBA;
 let rvBA0;
@@ -55,7 +55,7 @@ function setup() {
     rA = rA0;
     vA = vA0;
 
-    rrBA0 = createVector(rrBAx0, rrBAy0);
+    rrBA0 = createVector(rrBAx0, -rrBAy0);
     rvBA0 = createVector(rvBAx0, rvBAy0);
 
     rrBA = rrBA0;
@@ -128,7 +128,7 @@ function velocity(t) {
 }
 
 function rvelocity(t) {
-    return createVector(t / 2, 5);
+    return createVector(t / 2, 7);
 }
 
 function moveRelativeFrame(){
