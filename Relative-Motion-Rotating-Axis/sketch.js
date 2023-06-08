@@ -34,6 +34,7 @@ let baArray = [];
 
 let t = 0;
 let hm = false;
+let c = false;
 
 function setup() {
 
@@ -43,8 +44,10 @@ function setup() {
 
     hm = width > height;
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i)) {
         pixelDensity(1);
+        c = true;
+    }
 
     w = createVector(0, 0, 0.01);
 
@@ -87,6 +90,8 @@ function draw() {
         rotate(-PI/2);
     }
 
+    if(c)
+        text(navigator.userAgent, 100, 100);
 
     staticSetup();
 
@@ -103,7 +108,7 @@ function draw() {
     line(0, 0, rA.x - 7 * cos(rA.heading()), rA.y - 7 * sin(rA.heading()));
     createArrow(rA, rA.heading());
     pop();
-    displayText(rA, 'rₐ', -10);
+    displayText(rA, 'rₐ', -15);
 
     push();
     stroke('#052cab');
@@ -157,7 +162,7 @@ function moveOnRelativeFrame(){
     line(0, 0, rrBA.x - 7 * cos(rrBA.heading()), rrBA.y - 7 * sin(rrBA.heading()));
     createArrow(rrBA, rrBA.heading());
     pop();
-    displayText(rrBA, 'rᵦ₋ₐ', - 15);
+    displayText(rrBA, 'rᵦ₋ₐ', - 20);
 
     push();
     strokeWeight(6);
@@ -196,7 +201,7 @@ function displayText(r, str, yOff){
     push();
     translate(r.x / 2, r.y / 2 - yOff);
     rotate(r.heading());
-    textSize(18);
+    textSize(22);
     text(str, 0, 0);
     pop();
 }
