@@ -128,7 +128,7 @@ function velocity(t) {
 }
 
 function rvelocity(t) {
-    return createVector(t / 2, 7);
+    return createVector(t / 1.5 + 5, 8);
 }
 
 function moveRelativeFrame(){
@@ -159,16 +159,16 @@ function moveOnRelativeFrame(){
     displayText(rrBA, 'rᵦ₋ₐ', - 20);
 
     push();
-    strokeWeight(6);
-    point(rrBA.x, rrBA.y);
-    pop();
-
-    push();
     stroke('purple');
     for(let i = 0; i < baArray.length; i++)
         point(baArray[i].x, baArray[i].y);
 
     baArray.push(rrBA.copy());
+    pop();
+
+    push();
+    strokeWeight(6);
+    point(rrBA.x, rrBA.y);
     pop();
 
 }
