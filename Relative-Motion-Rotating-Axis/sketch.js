@@ -93,7 +93,7 @@ function draw() {
     if(c){
         text("____________", 300, -200);
     }
-    text(navigator.userAgent, 100, -100);
+    text(navigator.userAgent, 700, -100);
 
     staticSetup();
 
