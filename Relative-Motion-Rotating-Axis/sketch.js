@@ -40,6 +40,9 @@ function setup() {
     background(240);
     frameRate(fps);
 
+    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+        pixelDensity(1);
+
     w = createVector(0, 0, 0.01);
 
     vA0 = createVector(vAx0, vAy0);

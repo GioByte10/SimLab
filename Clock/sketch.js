@@ -10,8 +10,6 @@ let now = new Date();
 let chd = now.getHours();
 let cmd = now.getMinutes() + now.getSeconds() / 60;
 
-let mobile = false;
-
 let angle;
 
 
@@ -21,9 +19,6 @@ function setup() {
     frameRate(fps);
 
     r = min(width, height) / 3.5;
-
-    if(navigator.userAgent.match(/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/i))
-        mobile = true;
 
     if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
         pixelDensity(1);
