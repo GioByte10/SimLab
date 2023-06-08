@@ -84,11 +84,12 @@ function draw() {
 
     line(0, 0, rA.x - 7 * cos(rA.heading()), rA.y - 7 * sin(rA.heading()));
     createArrow(rA, rA.heading());
-    //displayText(rA, 'A', -20);
+    displayText(rA, 'rₐ', -10);
 
     rB = rA.copy().add(rrBA.copy().rotate(theta));
     line(0, 0, rB.x - 7 * cos(rB.heading()), rB.y - 7 * sin(rB.heading()));
     createArrow(rB, rB.heading());
+    displayText(rB, 'rᵦ', 15);
 
 }
 
@@ -122,7 +123,8 @@ function moveOnRelativeFrame(){
     rrBA.add(rvBA.x / fps, -rvBA.y / fps);
 
     line(0, 0, rrBA.x - 7 * cos(rrBA.heading()), rrBA.y - 7 * sin(rrBA.heading()));
-    createArrow(rrBA, rrBA.heading())
+    createArrow(rrBA, rrBA.heading());
+    displayText(rrBA, 'rᵦ₋ₐ', - 15);
 
     strokeWeight(6);
     point(rrBA.x, rrBA.y);
