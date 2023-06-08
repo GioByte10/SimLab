@@ -248,7 +248,7 @@ function createClearButton(){
     clearButton.style("cursor", "pointer");
     clearButton.style("display", "inline-block");
     clearButton.style("font-family", "Haas Grot Text R Web, Helvetica Neue, Helvetica, Arial, sans-serif");
-    clearButton.style("font-size", "16px");
+    clearButton.style("font-size", "20px");
     clearButton.style("font-weight", "500");
     clearButton.style("height", "40px");
     clearButton.style("line-height", "20px");
@@ -270,7 +270,7 @@ function createClearButton(){
     clearButton.style("background-color", "transparent", ":hover");
     clearButton.style("background-color", "transparent", ":focus");
 
-    clearButton.position(width - 80, height - 50);
+    clearButton.position(width - 85, height - 45);
 
     clearButton.mouseClicked(clearScreen);
     clearButton.touchStarted(clearScreen);
