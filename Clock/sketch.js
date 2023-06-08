@@ -23,7 +23,6 @@ function setup() {
     if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
-
     angle = cmd * 6 + chd * 360;
 
     createButtons();

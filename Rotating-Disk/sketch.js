@@ -14,9 +14,6 @@ function setup() {
     pixelDensity(1);
     noFill();
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
-        pixelDensity(1);
-
     r = min(width, height) / 2;
 }
 
