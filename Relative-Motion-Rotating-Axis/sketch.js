@@ -91,7 +91,7 @@ function draw() {
     }
 
     if(c)
-        text(navigator.userAgent, 100, 100);
+        text(navigator.userAgent, 100, -100);
 
     staticSetup();
 
