@@ -266,7 +266,7 @@ function createClearButton(){
     clearButton.style("touch-action", "manipulation");
     clearButton.style("alpha", "1");
 
-    // Apply hover and focus styles
+
     clearButton.style("background-color", "transparent", ":hover");
     clearButton.style("background-color", "transparent", ":focus");
 

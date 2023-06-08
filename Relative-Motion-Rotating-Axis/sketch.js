@@ -82,23 +82,22 @@ function draw() {
 
     moveRelativeFrame();
 
-    line(0, 0, rA.x, rA.y);
+    line(0, 0, rA.x - 7 * cos(rA.heading()), rA.y - 7 * sin(rA.heading()));
     createArrow(rA, rA.heading());
+    //displayText(rA, 'A', -20);
 
     rB = rA.copy().add(rrBA.copy().rotate(theta));
-    line(0, 0, rB.x, rB.y);
+    line(0, 0, rB.x - 7 * cos(rB.heading()), rB.y - 7 * sin(rB.heading()));
     createArrow(rB, rB.heading());
 
-    //text(vectorTheta, 50, -50);
 }
 
 function velocity(t) {
-    let v = createVector(5, 0);
-    return v;
+    return createVector(5, 0);
 }
 
 function rvelocity(t) {
-    return createVector(5, t);
+    return createVector(t / 2, 5);
 }
 
 function moveRelativeFrame(){
@@ -122,10 +121,10 @@ function moveOnRelativeFrame(){
     rvBA = rvelocity(frameCount / fps).add(rvBA0);
     rrBA.add(rvBA.x / fps, -rvBA.y / fps);
 
-    line(0, 0, rrBA.x, rrBA.y);
+    line(0, 0, rrBA.x - 7 * cos(rrBA.heading()), rrBA.y - 7 * sin(rrBA.heading()));
     createArrow(rrBA, rrBA.heading())
 
-    strokeWeight(8);
+    strokeWeight(6);
     point(rrBA.x, rrBA.y);
 
 }
@@ -133,7 +132,7 @@ function moveOnRelativeFrame(){
 function createArrow(r, a){
     push();
 
-    translate(r.x, r.y);
+    translate(r.x - 7 * cos(a), r.y - 7 *sin(a));
     rotate(a);
 
     beginShape();
@@ -144,5 +143,15 @@ function createArrow(r, a){
     vertex(-10, 4);
 
     endShape();
+    pop();
+}
+
+function displayText(r, str, yOff){
+    //display text at the middle of the vector
+    push();
+    translate(r.x / 2, r.y / 2 - yOff);
+    rotate(r.heading());
+    textSize(18);
+    text(str, 0, 0);
     pop();
 }
