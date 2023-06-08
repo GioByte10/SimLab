@@ -110,6 +110,7 @@ function draw() {
     }
     systemEnergy();
     staticSetup();
+    text(navigator.userAgent.toString(), width/2, height/2 + 100);
 }
 
 function systemEnergy(){
