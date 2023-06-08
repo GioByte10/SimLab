@@ -49,7 +49,7 @@ function setup() {
         c = true;
     }
 
-    w = createVector(0, 0, 0.01);
+    w = createVector(0, 0, 0.012);
 
     vA0 = createVector(vAx0, vAy0);
     rA0 = createVector(rAx0, -rAy0);
@@ -90,8 +90,10 @@ function draw() {
         rotate(-PI/2);
     }
 
-    if(c)
-        text(navigator.userAgent, 100, -100);
+    if(c){
+        text("____________", 300, -200);
+    }
+    text(navigator.userAgent, 100, -100);
 
     staticSetup();
 
@@ -197,7 +199,6 @@ function createArrow(r, a){
 }
 
 function displayText(r, str, yOff){
-    //display text at the middle of the vector
     push();
     translate(r.x / 2, r.y / 2 - yOff);
     rotate(r.heading());
