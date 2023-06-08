@@ -33,12 +33,15 @@ let bArray = [];
 let baArray = [];
 
 let t = 0;
+let hm = false;
 
 function setup() {
 
     createCanvas(window.innerWidth, window.innerHeight);
     background(240);
     frameRate(fps);
+
+    hm = width > height;
 
     if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
         pixelDensity(1);
@@ -77,7 +80,14 @@ function staticSetup(){
 function draw() {
 
     background(240);
-    translate(edgeOffset, height - edgeOffset);
+    if(hm) {
+        translate(edgeOffset, height - edgeOffset);
+    }else {
+        translate(width - edgeOffset, height - edgeOffset);
+        rotate(-PI/2);
+    }
+
+
     staticSetup();
 
     t = frameCount / fps;
