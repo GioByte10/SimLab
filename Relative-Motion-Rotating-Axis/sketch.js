@@ -29,6 +29,9 @@ let rvBAy0 = 0;
 
 let rB;
 
+let bArray = [];
+let baArray = [];
+
 let t = 0;
 
 function setup() {
@@ -82,14 +85,28 @@ function draw() {
 
     moveRelativeFrame();
 
+    push();
+    stroke('#ab0505');
     line(0, 0, rA.x - 7 * cos(rA.heading()), rA.y - 7 * sin(rA.heading()));
     createArrow(rA, rA.heading());
+    pop();
     displayText(rA, 'rₐ', -10);
 
+    push();
+    stroke('#052cab');
     rB = rA.copy().add(rrBA.copy().rotate(theta));
     line(0, 0, rB.x - 7 * cos(rB.heading()), rB.y - 7 * sin(rB.heading()));
     createArrow(rB, rB.heading());
+    pop();
     displayText(rB, 'rᵦ', 15);
+
+    push();
+    stroke('#068f13');
+    for(let i = 0; i < bArray.length; i++)
+        point(bArray[i].x, bArray[i].y);
+
+    bArray.push(rB.copy());
+    pop();
 
 }
 
@@ -122,12 +139,25 @@ function moveOnRelativeFrame(){
     rvBA = rvelocity(frameCount / fps).add(rvBA0);
     rrBA.add(rvBA.x / fps, -rvBA.y / fps);
 
+    push();
+    stroke('#fa9716');
     line(0, 0, rrBA.x - 7 * cos(rrBA.heading()), rrBA.y - 7 * sin(rrBA.heading()));
     createArrow(rrBA, rrBA.heading());
+    pop();
     displayText(rrBA, 'rᵦ₋ₐ', - 15);
 
+    push();
     strokeWeight(6);
     point(rrBA.x, rrBA.y);
+    pop();
+
+    push();
+    stroke('purple');
+    for(let i = 0; i < baArray.length; i++)
+        point(baArray[i].x, baArray[i].y);
+
+    baArray.push(rrBA.copy());
+    pop();
 
 }
 
