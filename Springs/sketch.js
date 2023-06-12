@@ -40,9 +40,6 @@ class Spring{
         this.v += this.a / fps;
         this.x += this.v / fps;
 
-        text(this.v, 400, 600);
-        text(this.x, 400, 650);
-
         noFill();
         beginShape();
         for(let i = 0; i < this.x; i++)
