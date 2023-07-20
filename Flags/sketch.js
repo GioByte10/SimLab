@@ -14,7 +14,8 @@ let smallHeight;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(fps);
-  //textSize(28);
+  textSize(32);
+  textFont("monospace");
 
   createSelectMenu();
   selectEvent();
@@ -46,6 +47,11 @@ function mexico(){
 
     flagSection %= 3;
     let flagColors = [[0, 104, 71], [255, 255, 255], [206, 17, 38]];
+    let n = doneSections.filter(Boolean).length;
+    let d = doneSections.length
+
+    fill(0);
+    text(n + "/" + d, 10, 80);
 
 
     if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
@@ -54,9 +60,9 @@ function mexico(){
         let b = wheel * 3;
 
         fill(0);
-        text("r = " + round(r), 10, 40);
-        text("g = " + round(g), 10, 60);
-        text("b = " + round(b), 10, 80);
+        text("r: " + round(r), 10, 160);
+        text("g: " + round(g), 10, 200);
+        text("b: " + round(b), 10, 240);
 
         if (flagSection === 0 && !doneSections[0]) {
             colors[0] = color(r, g, b);
@@ -117,6 +123,8 @@ function createSelectMenu(){
     select.option('Taiwan');
     select.option('Japan');
     select.option('China');
+
+    //select.size(100);
 
     select.selected('Mexico');
     select.changed(selectEvent);
