@@ -34,7 +34,7 @@ function draw(){
     text('fps: ' + floor(frameRate()), 10, 30);
     text(mouseY / height * 255, 10, 60);
     text(mouseX / width * 255, 10, 75);
-    text(b, 10, 90);
+    text(b * 3, 10, 90);
 
     for(let i = 0; i < objects.length; i++)
         objects[i].update();
@@ -58,5 +58,6 @@ class object{
 
 function mouseWheel(event) {
     if(abs(event.deltaY) > 0)
-        b += abs(event.deltaY) / event.deltaY;
+        b += abs(event.deltaY) / event.deltaY
+    b = constrain(b, 0, 255 / 3);
 }
