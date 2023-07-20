@@ -1,16 +1,20 @@
+// noinspection JSUnusedGlobalSymbols
+
 let fps = 60;
 let selection;
 let select;
 
 let colors = [];
-let mouseWheels = [];
-let mouseIndex = 0;
-let smallHeight;
+let doneSections = [];
+let wheel = 0;
+let flagSection = 0;
 let once = false;
+let smallHeight;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(fps);
+  //textSize(28);
 
   createSelectMenu();
   selectEvent();
@@ -21,14 +25,6 @@ function draw() {
     background(220);
 
     if(selection === 'Mexico') {
-        if(!once) {
-            smallHeight = 4/7 < width / height;
-            colors = [color(255), color(255), color(255)];
-            mouseWheels = [0, 0, 0];
-
-            once = true;
-
-        }
         mexico();
     }
 
@@ -48,19 +44,49 @@ function mexico(){
         flagHeight = flagWidth * 4 / 7;
     }
 
+    flagSection %= 3;
+    let flagColors = [[0, 104, 71], [255, 255, 255], [206, 17, 38]];
 
-    if(mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth / 3 && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
-        mouseIndex = 0;
-        colors[0] = color(((mouseX - (width - flagWidth) / 2) / (flagWidth / 3)) * 255, ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255, mouseWheels[0] * 3);
+
+    if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
+        let r = ((mouseX - (width - flagWidth) / 2) / flagWidth) * 255;
+        let g = ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255;
+        let b = wheel * 3;
+
+        fill(0);
+        text("r = " + round(r), 10, 40);
+        text("g = " + round(g), 10, 60);
+        text("b = " + round(b), 10, 80);
+
+        if (flagSection === 0 && !doneSections[0]) {
+            colors[0] = color(r, g, b);
+
+            if(abs(r - flagColors[0][0]) <= 10 && abs(g - flagColors[0][1]) <= 10 && abs(b - flagColors[0][2]) <= 10) {
+                doneSections[0] = true;
+                colors[0] = color(flagColors[0][0], flagColors[0][1], flagColors[0][2]);
+            }
+
+        }else if (flagSection === 1 && !doneSections[1]) {
+            colors[1] = color(r, g, b);
+
+            if(abs(r - flagColors[1][0]) <= 10 && abs(g - flagColors[1][1]) <= 10 && abs(b - flagColors[1][2]) <= 10) {
+                doneSections[1] = true;
+                colors[1] = color(flagColors[1][0], flagColors[1][1], flagColors[1][2]);
+            }
+
+        }else if(flagSection === 2 && !doneSections[2]){
+            colors[2] = color(r, g, b);
+
+            if(abs(r - 206) <= 10 && abs(g - 17) <= 10 && abs(b - 38) <= 10) {
+                doneSections[2] = true;
+                colors[2] = color(flagColors[2][0], flagColors[2][1], flagColors[2][2]);
+            }
+        }
     }
 
-    else if(mouseX > (width - flagWidth) / 2 + flagWidth / 3 && mouseX < (width - flagWidth) / 2 + flagWidth * 2 / 3) {
-        mouseIndex = 1;
-        colors[1] = color(((mouseX - ((width - flagWidth) / 2 + flagWidth / 3)) / (flagWidth / 3)) * 255, ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255, mouseWheels[1] * 3);
-    }
 
-    else if(mouseX > (width - flagWidth) / 2 + flagWidth * 2 / 3 && mouseX < (width - flagWidth) / 2 + flagWidth)
-        colors[2] = color(255, 0, 0);
+
+
 
     fill(colors[0]);
     rect((width - flagWidth) / 2, (height - flagHeight) / 2, flagWidth / 3, flagHeight);
@@ -75,8 +101,12 @@ function mexico(){
 
 function mouseWheel(event){
     if(abs(event.deltaY) > 0)
-        mouseWheels[mouseIndex] -= abs(event.deltaY) / event.deltaY
-    mouseWheels[mouseIndex] = constrain(mouseWheels[mouseIndex], 0, 255 / 3);
+        wheel -= abs(event.deltaY) / event.deltaY
+    wheel = constrain(wheel, 0, 255 / 3);
+}
+
+function mousePressed(){
+    flagSection++;
 }
 
 function createSelectMenu(){
@@ -98,6 +128,15 @@ function selectEvent() {
 }
 
 function reset(){
-    colors = [];
-    once = false;
+
+    wheel = 0;
+    flagSection = 0;
+    smallHeight = false;
+    if(selection === 'Mexico') {
+        colors = [color(220), color(220), color(220)];
+        doneSections = [false, false, false];
+        smallHeight = 4/7 < width / height;
+    }
+
+
 }
