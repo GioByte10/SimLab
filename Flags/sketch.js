@@ -9,13 +9,18 @@ let doneSections = [];
 let wheel = 0;
 let flagSection = 0;
 let once = false;
+let show = false;
 let smallHeight;
+
+let img;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   frameRate(fps);
+
   textSize(32);
   textFont("monospace");
+  imageMode(CENTER);
 
   createSelectMenu();
   selectEvent();
@@ -52,7 +57,6 @@ function mexico(){
 
     fill(0);
     text(n + "/" + d, 10, 80);
-
 
     if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
         let r = ((mouseX - (width - flagWidth) / 2) / flagWidth) * 255;
@@ -91,9 +95,6 @@ function mexico(){
     }
 
 
-
-
-
     fill(colors[0]);
     rect((width - flagWidth) / 2, (height - flagHeight) / 2, flagWidth / 3, flagHeight);
 
@@ -102,6 +103,15 @@ function mexico(){
 
     fill(colors[2]);
     rect((width - flagWidth) / 2 + flagWidth * 2 / 3, (height - flagHeight) / 2, flagWidth / 3, flagHeight);
+
+    image(img,  windowWidth / 2, windowHeight / 2, img.width / 2.2, img.height / 2.2);
+
+    if(keyIsPressed && keyCode === 72) {
+        fill(80);
+        for(let i = 0; i < flagColors.length; i++){
+            text(flagColors[i], mouseX + 40, mouseY + i * 40);
+        }
+    }
 
 }
 
@@ -141,6 +151,7 @@ function reset(){
     flagSection = 0;
     smallHeight = false;
     if(selection === 'Mexico') {
+        img = loadImage('images/eagle.png');
         colors = [color(220), color(220), color(220)];
         doneSections = [false, false, false];
         smallHeight = 4/7 < width / height;
