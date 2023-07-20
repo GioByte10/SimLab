@@ -3,6 +3,7 @@ let objects = [];
 let r = 10;
 
 let fps = 60;
+let b = 0;
 
 function setup(){
 
@@ -28,11 +29,15 @@ function setup(){
 
 function draw(){
 
-    background(255);
+    //200
+    background(mouseX / width * 255, mouseY / height * 255, b * 3);
+    text('fps: ' + floor(frameRate()), 10, 30);
+    text(mouseY / height * 255, 10, 60);
+    text(mouseX / width * 255, 10, 75);
+    text(b, 10, 90);
 
     for(let i = 0; i < objects.length; i++)
         objects[i].update();
-
 
 }
 
@@ -49,4 +54,9 @@ class object{
 
         text(this.emoji, this.x, this.y);
     }
+}
+
+function mouseWheel(event) {
+    if(abs(event.deltaY) > 0)
+        b += abs(event.deltaY) / event.deltaY;
 }
