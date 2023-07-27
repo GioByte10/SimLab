@@ -32,6 +32,8 @@ function draw() {
 
     if(selection === 'Mexico') {
         mexico();
+    }else if(selection === 'Taiwan'){
+        taiwan();
     }
 
 }
@@ -104,7 +106,7 @@ function mexico(){
     fill(colors[2]);
     rect((width - flagWidth) / 2 + flagWidth * 2 / 3, (height - flagHeight) / 2, flagWidth / 3, flagHeight);
 
-    image(img,  windowWidth / 2, windowHeight / 2, img.width / 2.2, img.height / 2.2);
+    image(img,  windowWidth / 2, windowHeight / 2, flagWidth / 4, flagWidth / 4.4);
 
     if(keyIsPressed && keyCode === 72) {
         fill(80);
@@ -112,6 +114,10 @@ function mexico(){
             text(flagColors[i], mouseX + 40, mouseY + i * 40);
         }
     }
+
+}
+
+function taiwan(){
 
 }
 
@@ -150,12 +156,17 @@ function reset(){
     wheel = 0;
     flagSection = 0;
     smallHeight = false;
+
     if(selection === 'Mexico') {
         img = loadImage('images/eagle.png');
         colors = [color(220), color(220), color(220)];
         doneSections = [false, false, false];
         smallHeight = 4/7 < width / height;
+
+    }else if(selection === 'Taiwan') {
+        img = loadImage('images/taiwan_sun.png');
+        colors = [color(220), color(220), color(220)];
+        doneSections = [false, false, false];
+        smallHeight = 2/3 < width / height;
     }
-
-
 }
