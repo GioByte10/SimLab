@@ -44,6 +44,10 @@ function draw() {
     else if(selection === 'China')
         china();
 
+    else if(selection === 'US')
+        us();
+
+
 }
 
 function mexico(){
@@ -51,62 +55,13 @@ function mexico(){
     let flagHeight;
     let flagWidth;
 
-    if(smallHeight){
-        flagHeight = height - 80;
-        flagWidth = flagHeight * 7 / 4;
-
-    }else{
-        flagWidth = width - 80;
-        flagHeight = flagWidth * 4 / 7;
-    }
-
     flagSection %= 3;
     let flagColors = [[0, 104, 71], [255, 255, 255], [206, 17, 38]];
-    let n = doneSections.filter(Boolean).length;
-    let d = doneSections.length
 
-    fill(0);
-    text(n + "/" + d, 10, 80);
-
-    if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
-        let r = ((mouseX - (width - flagWidth) / 2) / flagWidth) * 255;
-        let g = ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255;
-        let b = wheel * 3;
-
-        fill(0);
-        text("r: " + round(r), 10, 160);
-        text("g: " + round(g), 10, 200);
-        text("b: " + round(b), 10, 240);
-
-        if (flagSection === 0 && !doneSections[0]) {
-            colors[0] = color(r, g, b);
-
-            if(abs(r - flagColors[0][0]) <= 10 && abs(g - flagColors[0][1]) <= 10 && abs(b - flagColors[0][2]) <= 10) {
-                doneSections[0] = true;
-                colors[0] = color(flagColors[0][0], flagColors[0][1], flagColors[0][2]);
-            }
-
-        }else if (flagSection === 1 && !doneSections[1]) {
-            colors[1] = color(r, g, b);
-
-            if(abs(r - flagColors[1][0]) <= 10 && abs(g - flagColors[1][1]) <= 10 && abs(b - flagColors[1][2]) <= 10) {
-                doneSections[1] = true;
-                colors[1] = color(flagColors[1][0], flagColors[1][1], flagColors[1][2]);
-            }
-
-        }else if(flagSection === 2 && !doneSections[2]){
-            colors[2] = color(r, g, b);
-
-            if(abs(r - flagColors[2][0]) <= 10 && abs(g - flagColors[2][1]) <= 10 && abs(b - flagColors[2][2]) <= 10) {
-                doneSections[2] = true;
-                colors[2] = color(flagColors[2][0], flagColors[2][1], flagColors[2][2]);
-            }
-        }
-    }
-
+    [flagWidth, flagHeight] = colorFlag(4 / 7, 980, 560, flagColors);
 
     if(imageLoaded) {
-        image(img, width / 2 + 19, height / 2, flagWidth, flagHeight);
+        image(img, width / 2, height / 2, flagWidth, flagHeight);
 
         path = querySVG('path')[9];
         path.attribute('fill', colors[0]);
@@ -119,12 +74,7 @@ function mexico(){
         path.attribute('fill', colors[2]);
     }
 
-    if(keyIsPressed && keyCode === 72) {
-        fill(80);
-        for(let i = 0; i < flagColors.length; i++){
-            text(flagColors[i], mouseX + 40, mouseY + i * 40);
-        }
-    }
+    hint(flagColors);
 
 }
 
@@ -133,58 +83,10 @@ function taiwan(){
     let flagHeight;
     let flagWidth;
 
-    if(smallHeight){
-        flagHeight = height - 80;
-        flagWidth = flagHeight * 3 / 2;
-
-    }else{
-        flagWidth = width - 80;
-        flagHeight = flagWidth * 2 / 3;
-    }
-
     flagSection %= 3;
     let flagColors = [[254, 0, 0], [0, 0, 149], [255, 255, 255]];
-    let n = doneSections.filter(Boolean).length;
-    let d = doneSections.length
 
-    fill(0);
-    text(n + "/" + d, 10, 80);
-
-    if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
-        let r = ((mouseX - (width - flagWidth) / 2) / flagWidth) * 255;
-        let g = ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255;
-        let b = wheel * 3;
-
-        fill(0);
-        text("r: " + round(r), 10, 160);
-        text("g: " + round(g), 10, 200);
-        text("b: " + round(b), 10, 240);
-
-        if (flagSection === 0 && !doneSections[0]) {
-            colors[0] = color(r, g, b);
-
-            if(abs(r - flagColors[0][0]) <= 10 && abs(g - flagColors[0][1]) <= 10 && abs(b - flagColors[0][2]) <= 10) {
-                doneSections[0] = true;
-                colors[0] = color(flagColors[0][0], flagColors[0][1], flagColors[0][2]);
-            }
-
-        }else if (flagSection === 1 && !doneSections[1]) {
-            colors[1] = color(r, g, b);
-
-            if(abs(r - flagColors[1][0]) <= 10 && abs(g - flagColors[1][1]) <= 10 && abs(b - flagColors[1][2]) <= 10) {
-                doneSections[1] = true;
-                colors[1] = color(flagColors[1][0], flagColors[1][1], flagColors[1][2]);
-            }
-
-        }else if(flagSection === 2 && !doneSections[2]){
-            colors[2] = color(r, g, b);
-
-            if(abs(r - flagColors[2][0]) <= 10 && abs(g - flagColors[2][1]) <= 10 && abs(b - flagColors[2][2]) <= 10) {
-                doneSections[2] = true;
-                colors[2] = color(flagColors[2][0], flagColors[2][1], flagColors[2][2]);
-            }
-        }
-    }
+    [flagWidth, flagHeight] = colorFlag(2 / 3, 900, 600, flagColors);
 
     if(imageLoaded) {
         image(img, windowWidth / 2, windowHeight / 2, flagWidth, flagHeight);
@@ -202,64 +104,19 @@ function taiwan(){
         path.attribute('fill', colors[2]);
     }
 
-    if(keyIsPressed && keyCode === 72) {
-        fill(80);
-        for(let i = 0; i < flagColors.length; i++){
-            text(flagColors[i], mouseX + 40, mouseY + i * 40);
-        }
-    }
-
+    hint(flagColors);
 
 }
 
 function japan(){
+
     let flagHeight;
     let flagWidth;
 
-    if(smallHeight){
-        flagHeight = height - 80;
-        flagWidth = flagHeight * 3 / 2;
-
-    }else{
-        flagWidth = width - 80;
-        flagHeight = flagWidth * 2 / 3;
-    }
-
     flagSection %= 2;
     let flagColors = [[255, 255, 255], [188, 0, 45]];
-    let n = doneSections.filter(Boolean).length;
-    let d = doneSections.length
 
-    fill(0);
-    text(n + "/" + d, 10, 80);
-
-    if (!doneSections.every(element => element === true) && mouseX > (width - flagWidth) / 2 && mouseX < (width - flagWidth) / 2 + flagWidth && mouseY > (height - flagHeight) / 2 && mouseY < (height - flagHeight) / 2 + flagHeight) {
-        let r = ((mouseX - (width - flagWidth) / 2) / flagWidth) * 255;
-        let g = ((mouseY - (height - flagHeight) / 2) / flagHeight) * 255;
-        let b = wheel * 3;
-
-        fill(0);
-        text("r: " + round(r), 10, 160);
-        text("g: " + round(g), 10, 200);
-        text("b: " + round(b), 10, 240);
-
-        if (flagSection === 0 && !doneSections[0]) {
-            colors[0] = color(r, g, b);
-
-            if(abs(r - flagColors[0][0]) <= 10 && abs(g - flagColors[0][1]) <= 10 && abs(b - flagColors[0][2]) <= 10) {
-                doneSections[0] = true;
-                colors[0] = color(flagColors[0][0], flagColors[0][1], flagColors[0][2]);
-            }
-
-        }else if (flagSection === 1 && !doneSections[1]) {
-            colors[1] = color(r, g, b);
-
-            if(abs(r - flagColors[1][0]) <= 10 && abs(g - flagColors[1][1]) <= 10 && abs(b - flagColors[1][2]) <= 10) {
-                doneSections[1] = true;
-                colors[1] = color(flagColors[1][0], flagColors[1][1], flagColors[1][2]);
-            }
-        }
-    }
+    [flagWidth, flagHeight] = colorFlag(2 / 3, 900, 600, flagColors);
 
     if(imageLoaded) {
         image(img, windowWidth / 2, windowHeight / 2, flagWidth, flagHeight);
@@ -270,29 +127,79 @@ function japan(){
         path.attribute('fill', colors[1]);
     }
 
-    if(keyIsPressed && keyCode === 72) {
-        fill(80);
-        for(let i = 0; i < flagColors.length; i++){
-            text(flagColors[i], mouseX + 40, mouseY + i * 40);
-        }
-    }
+    hint(flagColors);
+
 }
 
 function china(){
+
+    let flagWidth;
+    let flagHeight;
+
+    flagSection %= 2;
+    let flagColors = [[238, 28, 37], [255, 255, 0]];
+
+    [flagWidth, flagHeight] = colorFlag(2 / 3, 900, 600, flagColors);
+
+    if(imageLoaded) {
+        image(img, windowWidth / 2, windowHeight / 2, flagWidth, flagHeight);
+        path = querySVG('path')[0];
+        path.attribute('fill', colors[0]);
+
+        path = querySVG('path')[1];
+        path.attribute('fill', colors[1]);
+    }
+
+    hint(flagColors);
+
+}
+
+function us(){
+
+    let flagWidth;
+    let flagHeight;
+
+    flagSection %= 4;
+    let flagColors = [[178, 34, 52], [255, 255, 255], [60, 59, 110], [255, 255, 255]];
+
+    [flagWidth, flagHeight] = colorFlag(10 / 19, 1000, 526, flagColors);
+
+    if(imageLoaded) {
+        image(img, windowWidth / 2, windowHeight / 2, flagWidth, flagHeight);
+        path = querySVG('rect')[1];
+        path.attribute('fill', colors[0]);
+
+        path = querySVG('path')[0];
+        path.attribute('stroke', colors[1]);
+
+        path = querySVG('rect')[2];
+        path.attribute('fill', colors[2]);
+
+        path = querySVG('path')[1];
+        path.attribute('fill', colors[3]);
+    }
+
+    hint(flagColors);
+
+}
+
+function colorFlag(ratio, actualWidth, actualHeight, flagColors){
+
     let flagHeight;
     let flagWidth;
 
     if(smallHeight){
         flagHeight = height - 80;
-        flagWidth = flagHeight * 3 / 2;
+        flagWidth = flagHeight / ratio;
 
     }else{
         flagWidth = width - 80;
-        flagHeight = flagWidth * 2 / 3;
+        flagHeight = flagWidth * ratio;
     }
 
-    flagSection %= 2;
-    let flagColors = [[238, 28, 37], [255, 255, 0]];
+    flagWidth = constrain(flagWidth, 0, actualWidth);
+    flagHeight = constrain(flagHeight, 0, actualHeight);
+
     let n = doneSections.filter(Boolean).length;
     let d = doneSections.length
 
@@ -309,33 +216,30 @@ function china(){
         text("g: " + round(g), 10, 200);
         text("b: " + round(b), 10, 240);
 
-        if (flagSection === 0 && !doneSections[0]) {
-            colors[0] = color(r, g, b);
 
-            if(abs(r - flagColors[0][0]) <= 10 && abs(g - flagColors[0][1]) <= 10 && abs(b - flagColors[0][2]) <= 10) {
-                doneSections[0] = true;
-                colors[0] = color(flagColors[0][0], flagColors[0][1], flagColors[0][2]);
-            }
-
-        }else if (flagSection === 1 && !doneSections[1]) {
-            colors[1] = color(r, g, b);
-
-            if(abs(r - flagColors[1][0]) <= 10 && abs(g - flagColors[1][1]) <= 10 && abs(b - flagColors[1][2]) <= 10) {
-                doneSections[1] = true;
-                colors[1] = color(flagColors[1][0], flagColors[1][1], flagColors[1][2]);
+        if(!doneSections[flagSection]){
+            colors[flagSection] = color(r, g, b);
+            if(abs(r - flagColors[flagSection][0]) <= 10 && abs(g - flagColors[flagSection][1]) <= 10 && abs(b - flagColors[flagSection][2]) <= 10) {
+                doneSections[flagSection] = true;
+                colors[flagSection] = color(flagColors[flagSection][0], flagColors[flagSection][1], flagColors[flagSection][2]);
             }
         }
     }
 
-    if(imageLoaded) {
-        image(img, windowWidth / 2, windowHeight / 2, flagWidth, flagHeight);
-        path = querySVG('path')[0];
-        path.attribute('fill', colors[0]);
+    if(doneSections.every(element => element === true)){
+        fill(0);
+        textSize(40);
+        text("🎉🎉", 10, 280);
 
-        path = querySVG('path')[1];
-        path.attribute('fill', colors[1]);
+        textSize(24);
+        textAlign(LEFT);
     }
 
+    return [flagWidth, flagHeight];
+
+}
+
+function hint(flagColors){
     if(keyIsPressed && keyCode === 72) {
         fill(80);
         for(let i = 0; i < flagColors.length; i++){
@@ -343,7 +247,6 @@ function china(){
         }
     }
 }
-
 
 function mouseWheel(event){
     if(abs(event.deltaY) > 0)
@@ -363,8 +266,9 @@ function createSelectMenu(){
     select.option('Taiwan');
     select.option('Japan');
     select.option('China');
+    select.option('US');
 
-    select.selected('China');
+    select.selected('Mexico');
     select.changed(selectEvent);
 
 }
@@ -408,5 +312,11 @@ function reset(){
         colors = [color(220), color(220)];
         doneSections = [false, false];
         smallHeight = 2/3 < width / height;
+
+    }else if(selection === 'US'){
+        img = loadSVG('images/Flag_of_the_United_States.svg', imageSuccess);
+        colors = [color(220), color(220), color(220), color(220)];
+        doneSections = [false, false, false, false];
+        smallHeight = 10/19 < width / height;
     }
 }
