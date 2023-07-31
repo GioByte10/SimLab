@@ -1,38 +1,31 @@
-let img;
-let path;
-let i = 0;
-
-function preload(){
-
-    img = loadSVG('assets/Flag_of_the_United_States.svg');
-    frameRate(20);
-
-}
+let objects1 = [];
+let objects2 = [];
 
 function setup(){
-    createCanvas(windowWidth, windowHeight, SVG);
 
-    image(img, 0, 0, 1000, 100);
-    //path = querySVG('path')[0];
-
-}
-
-function draw(){
-
-    clear();
     background(220);
-    image(img, 0, 0, 500, 500);
 
-    path = querySVG('path')[0];
-    //path.attribute('class', 0);
-    path.attribute('fill', color(mouseX / width * 255, mouseY / height * 255, frameCount % 255));
+    objects1.push(new testObject(width / 2, height / 2, '🪨'));
+    objects1.push(new testObject(random(width), random(height), '📜'));
 
-    fill(255);
-    text(i, 10, 10);
+    objects2.push(new testObject(width / 2, height / 2, '🪨'));
+    objects2.push(new testObject(random(width), random(height), '📜'));
+
+    objects1[0].update();
+    text(objects2[0].emoji, 10, 100);
 
 }
 
 
-function mousePressed(){
-    i++;
+class testObject{
+    constructor(x, y, emoji){
+        this.position = createVector(x, y);
+        this.emoji = emoji;
+    }
+
+    update(){
+        let o = objects2[0];
+        o.emoji = '✂️';
+    }
+
 }
