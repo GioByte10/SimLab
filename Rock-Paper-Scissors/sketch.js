@@ -48,43 +48,6 @@ function draw(){
 
 }
 
-class RockObject{
-
-    constructor(x, y) {
-        this.position = createVector(x, y);
-        this.emoji = '🪨';
-    }
-
-    update() {
-        let closest = createVector(Infinity, Infinity);
-        let other;
-
-        for(let i = 0; i < paperObjects.length; i++)
-            if(paperObjects[i].position.dist(this.position) < closest.mag()){
-                closest = p5.Vector.sub(paperObjects[i].position, this.position);
-                other = paperObjects[i];
-            }
-    }
-}
-
-class PaperObject{
-    constructor(x, y) {
-        this.position = createVector(x, y);
-        this.emoji = '📜';
-    }
-
-    update() {
-        let closest = createVector(Infinity, Infinity);
-        let other;
-
-        for(let i = 0; i < scissorObjects.length; i++)
-            if(scissorObjects[i].position.dist(this.position) < closest.mag()){
-                closest = p5.Vector.sub(scissorObjects[i].position, this.position);
-                other = paperObjects[i];
-            }
-    }
-}
-
 class RPSObject {
     constructor(x, y, emoji){
         this.position = createVector(x, y);
@@ -93,27 +56,22 @@ class RPSObject {
 
     update(){
 
-        let closest;
-        let other;
-
         if(this.emoji === '🪨')
-            this.findTarget(rockObjects, scissorObjects, paperObjects);
+            this.findTarget(rockObjects, scissorObjects);
 
         else if(this.emoji === '📜')
-            this.findTarget(paperObjects, rockObjects, scissorObjects);
+            this.findTarget(paperObjects, rockObjects);
 
         else if(this.emoji === '✂️')
-            this.findTarget(scissorObjects, paperObjects, rockObjects);
+            this.findTarget(scissorObjects, paperObjects);
 
         this.checkBoundaries();
 
         text(this.emoji, this.position.x, this.position.y);
     }
 
-    findTarget(currentArray, targetArray, escapeArray){
+    findTarget(currentArray, targetArray){
         let closestTarget = createVector(Infinity, Infinity);
-        let closestEscape = createVector(Infinity, Infinity);
-        let direction = createVector(0, 0);
         let other;
 
         for (let i = 0; i < targetArray.length; i++)
@@ -122,21 +80,17 @@ class RPSObject {
                 other = targetArray[i];
             }
 
-        for(let i = 0; i < escapeArray.length; i++)
-            if(escapeArray[i].position.dist(this.position) < closestEscape.mag())
-                closestEscape = p5.Vector.sub(escapeArray[i].position, this.position);
+        this.position.add(createVector(random(-2, 2), random(-2, 2)))
 
-        if(closestTarget.mag() < 2 * r) {
-            other.emoji = this.emoji;
-            targetArray.splice(targetArray.indexOf(other), 1);
-            currentArray.push(other);
+        if(closestTarget.mag() !== Infinity) {
+            if (closestTarget.mag() < 2 * r) {
+                other.emoji = this.emoji;
+                targetArray.splice(targetArray.indexOf(other), 1);
+                currentArray.push(other);
 
-        }else {
-            let m = closestEscape.mag() / closestTarget.mag();
-            closestTarget.normalize().mult(pow(m, 4));
-            closestEscape.normalize();
-            direction.add(closestTarget).sub(closestEscape).normalize();
-            this.position.add(direction).add(createVector(random(-2, 2), random(-2, 2)))
+            } else {
+                this.position.add(closestTarget.normalize().mult(0.5));
+            }
         }
 
     }
