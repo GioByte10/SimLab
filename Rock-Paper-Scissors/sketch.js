@@ -14,9 +14,9 @@ let over = false;
 let wait;
 
 function preload(){
-    rockSound = createAudio('sounds/rock.mp3');
-    paperSound = createAudio('sounds/paper.mp3');
-    scissorSound = createAudio('sounds/scissors.mp3');
+    rockSound = loadSound('sounds/rock.mp3');
+    paperSound = loadSound('sounds/paper.mp3');
+    scissorSound = loadSound('sounds/scissors.mp3');
 
 }
 
@@ -155,7 +155,7 @@ class RPSObject {
         if(closestTarget.mag() !== Infinity) {
             if (closestTarget.mag() < 2 * radius) {
                 other.emoji = this.emoji;
-                sound.volume(0.2);
+                sound.setVolume(0.1);
                 sound.play();
                 targetArray.splice(targetArray.indexOf(other), 1);
                 currentArray.push(other);
