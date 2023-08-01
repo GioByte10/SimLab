@@ -45,7 +45,10 @@ function setup(){
 
 function draw(){
 
+    textSize(20);
+
     if(over){
+
         if(frameCount % (fps * 5) < (3 * fps)){
             if (!wait) {
                 r = random(255);
@@ -60,11 +63,13 @@ function draw(){
             wait = false;
         }
 
+        fill(70);
+        text("click to restart", width / 2, height / 2 + 50);
+
     }else {
         background(200);
     }
 
-    textSize(20);
 
     for(let i = 0; i < rockObjects.length; i++)
         rockObjects[i].update();
@@ -75,6 +80,7 @@ function draw(){
     for(let i = 0; i < scissorObjects.length; i++)
         scissorObjects[i].update();
 
+    fill(0);
     textSize(50);
 
     if(rockObjects.length === n) {
@@ -90,6 +96,26 @@ function draw(){
         over = true;
     }
 
+}
+
+function mouseClicked(){
+    if(over){
+        rockObjects = [];
+        paperObjects = [];
+        scissorObjects = [];
+        setup();
+        over = false;
+    }
+}
+
+function touchStarted(){
+    if(over){
+        rockObjects = [];
+        paperObjects = [];
+        scissorObjects = [];
+        setup();
+        over = false;
+    }
 }
 
 class RPSObject {
