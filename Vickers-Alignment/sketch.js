@@ -56,7 +56,6 @@ function draw(){
     staticSetup();
     logs();
 }
-
 function staticSetup(){
     textSize(16);
     text('Focus', focusKnob.x, focusKnob.y + focusKnob.r * 1.4);
@@ -67,7 +66,7 @@ function staticSetup(){
 
     textSize(36);
     if(done)
-        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.8 / 10, windowHeight * 5 / 10);
+        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.7 / 10, windowHeight * 3 / 10);
 
 }
 function blur(){
@@ -85,11 +84,11 @@ function drawFilars(){
         rotate(-90);
 
     strokeWeight(0.9);
-    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -windowHeight / 2,
-        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), windowHeight / 2);
+    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -bg.width * (795 / 1280) / 2,
+        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), bg.width * (795 / 1280) / 2);
 
-    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -windowHeight / 2,
-        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), windowHeight / 2);
+    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -bg.width * (795 / 1280) / 2,
+        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), bg.width * (795 / 1280) / 2);
 
     strokeWeight(1.4);
     line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 250 / 1280 * bg.width - windowHeight / 2,
@@ -109,16 +108,20 @@ function checkVerticalFilars(){
         inputButton.setCallback(checkHorizontalFilars);
         vertical = false;
     }
-    else
+    else {
+        textSize(16);
         text("Please align filars", windowWidth * 9 / 10, windowHeight * 6 / 10);
+    }
 
 }
 function checkHorizontalFilars(){
     if(baseKnob.theta > filarBounds[1][0] && baseKnob.theta < filarBounds[1][1] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 > filarBounds[1][2] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 < filarBounds[1][3]) {
         inputButton.setCallback(noCallback);
         done = true;
-    }else
+    }else {
+        textSize(16);
         text("Please align filars", windowWidth * 9 / 10, windowHeight * 6 / 10);
+    }
 
 }
 class Knob{
