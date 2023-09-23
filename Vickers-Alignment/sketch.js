@@ -1,4 +1,4 @@
-let fps = 30;
+let fps = 60;
 let bg;
 let variation;
 
@@ -8,6 +8,7 @@ let focus;
 let focusKnob;
 let measuringKnob;
 let baseKnob;
+let lensKnob;
 
 let inputButton;
 let vertical = true;
@@ -29,15 +30,18 @@ function setup(){
     fill(192);
 
     focusKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 2 / 10, windowWidth / 20,
-        -360, 360, 0, 12);
+        -360, 360, 0, 12, 6);
     baseKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
-        -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12)
+        -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12, 6)
     measuringKnob = new Knob(windowWidth * 9 / 10, windowHeight * 8 / 10, windowWidth / 20,
-        baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12)
+        baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, 6)
+    lensKnob = new Knob(windowWidth / 2, windowHeight / 2, 790 / 1280 * bg.width / 2,
+    -180, -90, -180, 0, 20, false, false);
 
     knobs.push(focusKnob);
     knobs.push(measuringKnob);
     knobs.push(baseKnob);
+    knobs.push(lensKnob);
 
     focus = random(focusKnob.lowerTheta, focusKnob.upperTheta);
     inputButton = new Button(windowWidth * 8 / 10, windowHeight * 8 / 10, 40, 40, checkVerticalFilars);
@@ -52,7 +56,8 @@ function draw(){
 
     for(let i = 0; i < knobs.length; i++)
         knobs[i].display();
-
+    
+    lensOuterKnob();
     staticSetup();
     logs();
 }
@@ -64,10 +69,30 @@ function staticSetup(){
 
     text('Input', inputButton.x, measuringKnob.y + measuringKnob.r * 1.4);
 
+    if(!vertical)
+        text('Vertical input recorded', windowWidth * 9 / 10, windowHeight * 5.3 / 10);
+
     textSize(36);
     if(done)
         text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.7 / 10, windowHeight * 3 / 10);
 
+}
+function lensOuterKnob(){
+    push();
+    stroke(100);
+    strokeWeight(2);
+    translate(windowWidth / 2, windowHeight / 2);
+    rotate(-lensKnob.theta + 180);
+
+    let l = 72;
+
+    for(let i = 0; i < l; i++)
+        line((lensKnob.r - 9) * cos(360 * i / l), (lensKnob.r - 9) * sin(360 * i / l), (lensKnob.r + 8) * cos(360 * i / l), (lensKnob.r + 8) * sin(360 * i / l));
+
+    noFill();
+    circle(0, 0, lensKnob.r * 2 + 18);
+    circle(0, 0, lensKnob.r * 2 - 20);
+    pop();
 }
 function blur(){
     push();
@@ -81,7 +106,7 @@ function drawFilars(){
     translate(windowWidth / 2, windowHeight / 2);
 
     if(!vertical)
-        rotate(-90);
+        rotate(-lensKnob.theta + 180);
 
     strokeWeight(0.9);
     line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -bg.width * (795 / 1280) / 2,
@@ -107,6 +132,7 @@ function checkVerticalFilars(){
     if(baseKnob.theta > filarBounds[0][0] && baseKnob.theta < filarBounds[0][1] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 > filarBounds[0][2] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 < filarBounds[0][3]) {
         inputButton.setCallback(checkHorizontalFilars);
         vertical = false;
+        lensKnob.theta = -180;
     }
     else {
         textSize(16);
@@ -115,7 +141,7 @@ function checkVerticalFilars(){
 
 }
 function checkHorizontalFilars(){
-    if(baseKnob.theta > filarBounds[1][0] && baseKnob.theta < filarBounds[1][1] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 > filarBounds[1][2] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 < filarBounds[1][3]) {
+    if(baseKnob.theta > filarBounds[1][0] && baseKnob.theta < filarBounds[1][1] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 > filarBounds[1][2] && measuringKnob.theta + baseKnob.theta - baseKnob.theta0 < filarBounds[1][3] && lensKnob.theta > -95) {
         inputButton.setCallback(noCallback);
         done = true;
     }else {
@@ -125,7 +151,7 @@ function checkHorizontalFilars(){
 
 }
 class Knob{
-    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides){
+    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, fill = true, gradient = true){
         this.x = x;
         this.y = y;
         this.r = r;
@@ -139,6 +165,10 @@ class Knob{
 
         this.previousPosition = createVector(0, -this.r);
         this.currentPosition = createVector(0, -this.r);
+
+        this.strokeWeight = strokeWeight;
+        this.fill = fill;
+        this.gradient = gradient;
     }
 
     display(){
@@ -160,14 +190,17 @@ class Knob{
         this.theta = constrain(this.theta, this.lowerTheta, this.upperTheta);
         rotate(-this.theta);
 
-        linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
-        strokeWeight(6);
-        polygon(0, 0, this.r, this.sides);
+        if(this.gradient)
+            linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
+
+        strokeWeight(this.strokeWeight);
+        polygon(0, 0, this.r, this.sides, this.fill);
 
         stroke(0);
         strokeWeight(3);
         fill(0);
-        line(0, -this.r / 1.8, 0, (-1.5 / 2) * this.r);
+        if(this.fill)
+            line(0, -this.r / 1.8, 0, (-1.5 / 2) * this.r);
         pop();
     }
 }
@@ -232,7 +265,7 @@ class Button {
     }
 }
 function noCallback(){}
-function polygon(x, y, radius, sides) {
+function polygon(x, y, radius, sides, fill) {
     if(sides !== 0) {
         let angle = 360 / sides;
         beginShape();
@@ -241,9 +274,16 @@ function polygon(x, y, radius, sides) {
             let sy = y + sin(a) * radius;
             vertex(sx, sy);
         }
+
         endShape(CLOSE);
 
     }else{
+        if(fill)
+            fill(192);
+
+        else
+            noFill();
+
         circle(x, y, radius * 2);
     }
 }
