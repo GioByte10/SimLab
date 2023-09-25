@@ -16,6 +16,8 @@ let done = false;
 
 let filarBounds = [[-250, -227, 0, 25], [-185, -150, 55, 96]];
 
+let imageHeight;
+let imageWidth;
 
 function preload(){
     bg = loadImage('images/sample.png');
@@ -29,13 +31,16 @@ function setup(){
     angleMode(DEGREES);
     fill(192);
 
+    imageHeight = min(windowHeight, bg.height)
+    imageWidth = imageHeight * (1280 / 720);
+
     focusKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 2 / 10, windowWidth / 20,
         -360, 360, 0, 12, 6);
     baseKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
         -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12, 6)
-    measuringKnob = new Knob(windowWidth * 9 / 10, windowHeight * 8 / 10, windowWidth / 20,
+    measuringKnob = new Knob(windowWidth * 9.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
         baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, 6)
-    lensKnob = new Knob(windowWidth / 2, windowHeight / 2, 790 / 1280 * bg.width / 2,
+    lensKnob = new Knob(windowWidth / 2, windowHeight / 2, 790 / 1280 * imageWidth / 2,
     -180, -90, -180, 0, 20, false, false);
 
     knobs.push(focusKnob);
@@ -44,7 +49,7 @@ function setup(){
     knobs.push(lensKnob);
 
     focus = random(focusKnob.lowerTheta, focusKnob.upperTheta);
-    inputButton = new Button(windowWidth * 8 / 10, windowHeight * 8 / 10, 40, 40, checkVerticalFilars);
+    inputButton = new Button(windowWidth * 8.2 / 10, windowHeight * 8 / 10, 40, 40, checkVerticalFilars);
     variation = random(-1.5, 1.5);
 }
 function draw(){
@@ -56,7 +61,7 @@ function draw(){
 
     for(let i = 0; i < knobs.length; i++)
         knobs[i].display();
-    
+
     lensOuterKnob();
     staticSetup();
     logs();
@@ -97,7 +102,7 @@ function lensOuterKnob(){
 function blur(){
     push();
     drawingContext.filter = 'blur(' + str(abs(focusKnob.theta - focus)) / 30 + 'px)';
-    image(bg, (windowWidth - bg.width) / 2, (windowHeight - bg.height) / 2, bg.width, bg.height);
+    image(bg, (windowWidth - imageWidth) / 2, (windowHeight - imageHeight) / 2, imageWidth, imageHeight);
     pop();
 }
 function drawFilars(){
@@ -109,21 +114,21 @@ function drawFilars(){
         rotate(-lensKnob.theta + 180);
 
     strokeWeight(0.9);
-    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -bg.width * (795 / 1280) / 2,
-        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), bg.width * (795 / 1280) / 2);
+    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -imageWidth * (795 / 1280) / 2,
+        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), imageWidth * (795 / 1280) / 2);
 
-    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -bg.width * (795 / 1280) / 2,
-        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * bg.width * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), bg.width * (795 / 1280) / 2);
+    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * imageWidth * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -imageWidth * (795 / 1280) / 2,
+        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * imageWidth * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), imageWidth * (795 / 1280) / 2);
 
     strokeWeight(1.4);
-    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 250 / 1280 * bg.width - windowHeight / 2,
-        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * bg.width, 250 / 1280 * bg.width - windowHeight / 2);
+    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 250 / 1280 * imageWidth - windowHeight / 2,
+        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * imageWidth, 250 / 1280 * imageWidth - windowHeight / 2);
 
-    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 380 / 1280 * bg.width -windowHeight / 2,
-        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 160 / 1280 * bg.width, 380 / 1280 * bg.width -windowHeight / 2);
+    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 380 / 1280 * imageWidth -windowHeight / 2,
+        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 160 / 1280 * imageWidth, 380 / 1280 * imageWidth -windowHeight / 2);
 
-    line(baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 510 / 1280 * bg.width -windowHeight / 2,
-        baseKnob.theta * bg.width * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * bg.width, 510 / 1280 * bg.width -windowHeight / 2);
+    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 510 / 1280 * imageWidth -windowHeight / 2,
+        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * imageWidth, 510 / 1280 * imageWidth -windowHeight / 2);
 
     pop();
 
@@ -298,7 +303,8 @@ function linearGradient(x0, y0, x1, y1, color0, colorE){
 }
 function logs(){
     if(keyIsDown(68)){
-        text(baseKnob.theta, 50, 30);
-        text(measuringKnob.theta + baseKnob.theta - baseKnob.theta0, 50, 50);
+        textSize(16);
+        text(baseKnob.theta.toFixed(2), 100, 100);
+        text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 100, 100);
     }
 }
