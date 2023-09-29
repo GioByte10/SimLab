@@ -41,7 +41,7 @@ function setup(){
     measuringKnob = new Knob(windowWidth * 9.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
         baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, 6)
     lensKnob = new Knob(windowWidth / 2, windowHeight / 2, 790 / 1280 * imageWidth / 2,
-    -180, -90, -180, 0, 20, false, false);
+    -180, -90, -180, 0, 20, 0, -1);
 
     knobs.push(focusKnob);
     knobs.push(measuringKnob);
@@ -77,9 +77,9 @@ function staticSetup(){
     if(!vertical)
         text('Vertical input recorded', windowWidth * 9 / 10, windowHeight * 5.3 / 10);
 
-    textSize(36);
+    textSize(30);
     if(done)
-        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.7 / 10, windowHeight * 3 / 10);
+        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.8 / 10, windowHeight * 3 / 10);
 
 }
 function lensOuterKnob(){
@@ -156,7 +156,7 @@ function checkHorizontalFilars(){
 
 }
 class Knob{
-    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, fill = true, gradient = true){
+    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
         this.x = x;
         this.y = y;
         this.r = r;
@@ -172,8 +172,8 @@ class Knob{
         this.currentPosition = createVector(0, -this.r);
 
         this.strokeWeight = strokeWeight;
+        this.stroke = stroke;
         this.fill = fill;
-        this.gradient = gradient;
     }
 
     display(){
@@ -195,17 +195,17 @@ class Knob{
         this.theta = constrain(this.theta, this.lowerTheta, this.upperTheta);
         rotate(-this.theta);
 
-        if(this.gradient)
-            linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
-
+        this.stroke >= 0 ? stroke(this.stroke) : linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
+        this.fill >= 0 ? fill(this.fill) : noFill();
         strokeWeight(this.strokeWeight);
         polygon(0, 0, this.r, this.sides, this.fill);
 
-        stroke(0);
-        strokeWeight(3);
-        fill(0);
-        if(this.fill)
+        if(this.fill >= 0) {
+            stroke(0);
+            strokeWeight(3);
+            fill(0);
             line(0, -this.r / 1.8, 0, (-1.5 / 2) * this.r);
+        }
         pop();
     }
 }
@@ -279,16 +279,8 @@ function polygon(x, y, radius, sides, fill) {
             let sy = y + sin(a) * radius;
             vertex(sx, sy);
         }
-
         endShape(CLOSE);
-
     }else{
-        if(fill)
-            fill(192);
-
-        else
-            noFill();
-
         circle(x, y, radius * 2);
     }
 }
