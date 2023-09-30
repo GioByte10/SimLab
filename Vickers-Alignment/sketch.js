@@ -198,7 +198,7 @@ class Knob{
         this.stroke >= 0 ? stroke(this.stroke) : linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
         this.fill >= 0 ? fill(this.fill) : noFill();
         strokeWeight(this.strokeWeight);
-        polygon(0, 0, this.r, this.sides, this.fill);
+        this.polygon();
 
         if(this.fill >= 0) {
             stroke(0);
@@ -207,6 +207,20 @@ class Knob{
             line(0, -this.r / 1.8, 0, (-1.5 / 2) * this.r);
         }
         pop();
+    }
+    polygon() {
+        if(this.sides !== 0) {
+            let angle = 360 / this.sides;
+            beginShape();
+            for (let a = 0; a < 360; a += angle) {
+                let sx = cos(a) * this.r;
+                let sy = sin(a) * this.r;
+                vertex(sx, sy);
+            }
+            endShape(CLOSE);
+        }else{
+            circle(0, 0, this.r * 2);
+        }
     }
 }
 class Button {
@@ -270,20 +284,6 @@ class Button {
     }
 }
 function noCallback(){}
-function polygon(x, y, radius, sides, fill) {
-    if(sides !== 0) {
-        let angle = 360 / sides;
-        beginShape();
-        for (let a = 0; a < 360; a += angle) {
-            let sx = x + cos(a) * radius;
-            let sy = y + sin(a) * radius;
-            vertex(sx, sy);
-        }
-        endShape(CLOSE);
-    }else{
-        circle(x, y, radius * 2);
-    }
-}
 function linearGradient(x0, y0, x1, y1, color0, colorE){
     let gradient = drawingContext.createLinearGradient(
         x0, y0, x1, y1,
