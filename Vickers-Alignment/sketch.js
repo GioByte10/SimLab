@@ -155,6 +155,23 @@ function checkHorizontalFilars(){
     }
 
 }
+function noCallback(){}
+function linearGradient(x0, y0, x1, y1, color0, colorE){
+    let gradient = drawingContext.createLinearGradient(
+        x0, y0, x1, y1,
+    );
+    gradient.addColorStop(0, color0);
+    gradient.addColorStop(1, colorE);
+
+    drawingContext.strokeStyle = gradient;
+}
+function logs(){
+    if(keyIsDown(68)){
+        textSize(16);
+        text(baseKnob.theta.toFixed(2), 100, 100);
+        text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 100, 100);
+    }
+}
 class Knob{
     constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
         this.x = x;
@@ -281,22 +298,5 @@ class Button {
     }
     setCallback(callback) {
         this.callback = callback;
-    }
-}
-function noCallback(){}
-function linearGradient(x0, y0, x1, y1, color0, colorE){
-    let gradient = drawingContext.createLinearGradient(
-        x0, y0, x1, y1,
-    );
-    gradient.addColorStop(0, color0);
-    gradient.addColorStop(1, colorE);
-
-    drawingContext.strokeStyle = gradient;
-}
-function logs(){
-    if(keyIsDown(68)){
-        textSize(16);
-        text(baseKnob.theta.toFixed(2), 100, 100);
-        text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 100, 100);
     }
 }
