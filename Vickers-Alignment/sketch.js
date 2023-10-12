@@ -19,6 +19,10 @@ let filarBounds = [[-250, -227, 0, 25], [-185, -150, 55, 96]];
 let imageHeight;
 let imageWidth;
 
+let videoBack = false;
+let videoForward = false;
+let prevMouse = false;
+
 function preload(){
     bg = loadImage('images/sample.png');
 }
@@ -65,6 +69,8 @@ function draw(){
     lensOuterKnob();
     staticSetup();
     logs();
+    //prevMouse = mouseIsPressed;
+
 }
 function staticSetup(){
     textSize(16);
@@ -172,6 +178,17 @@ function logs(){
         text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 100, 100);
     }
 }
+function keyPressed(){
+    if(keyCode === LEFT_ARROW){
+        videoBack = true;
+    }else if(keyCode === RIGHT_ARROW){
+        videoForward = true;
+    }
+}
+// function mouseWheel(event) {
+//     for(let i = 0; i < knobs.length; i++)
+//         knobs[i].display(event.deltaY / 5);
+// }
 class Knob{
     constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
         this.x = x;
@@ -191,19 +208,31 @@ class Knob{
         this.strokeWeight = strokeWeight;
         this.stroke = stroke;
         this.fill = fill;
+
+        this.stillPressed = false;
     }
 
-    display(){
-        let dtheta = 0;
+    display(dtheta = 0){
+        if(dtheta === 0) {
+            if (mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < this.r)
+                this.stillPressed = true;
 
-        if(mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < this.r) {
-            this.previousPosition = this.currentPosition;
-            this.currentPosition = createVector(this.x - mouseX, mouseY - this.y);
-            dtheta = this.currentPosition.angleBetween(this.previousPosition);
+            else if (!mouseIsPressed)
+                this.stillPressed = false;
+
+            if (this.stillPressed) {
+                this.previousPosition = this.currentPosition;
+                this.currentPosition = createVector(this.x - mouseX, mouseY - this.y);
+                dtheta = this.currentPosition.angleBetween(this.previousPosition);
+
+            } else {
+                this.currentPosition = createVector(this.x - mouseX, mouseY - this.y);
+                this.previousPosition = this.currentPosition;
+            }
 
         }else{
-            this.currentPosition = createVector(this.x - mouseX, mouseY - this.y);
-            this.previousPosition = this.currentPosition;
+            if(!(dist(mouseX, mouseY, this.x, this.y) < this.r))
+                dtheta = 0;
         }
 
         push();
