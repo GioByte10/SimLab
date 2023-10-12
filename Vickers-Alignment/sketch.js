@@ -69,7 +69,7 @@ function draw(){
     lensOuterKnob();
     staticSetup();
     logs();
-    //prevMouse = mouseIsPressed;
+    prevMouse = mouseIsPressed;
 
 }
 function staticSetup(){
@@ -185,10 +185,11 @@ function keyPressed(){
         videoForward = true;
     }
 }
-// function mouseWheel(event) {
-//     for(let i = 0; i < knobs.length; i++)
-//         knobs[i].display(event.deltaY / 5);
-// }
+function mouseWheel(event) {
+    for(let i = 0; i < knobs.length; i++)
+        if((dist(mouseX, mouseY, knobs[i].x, knobs[i].y) < knobs[i].r))
+            knobs[i].display(event.delta / 3);
+}
 class Knob{
     constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
         this.x = x;
@@ -214,7 +215,7 @@ class Knob{
 
     display(dtheta = 0){
         if(dtheta === 0) {
-            if (mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < this.r)
+            if (!prevMouse  && mouseIsPressed && dist(mouseX, mouseY, this.x, this.y) < this.r)
                 this.stillPressed = true;
 
             else if (!mouseIsPressed)
@@ -229,10 +230,6 @@ class Knob{
                 this.currentPosition = createVector(this.x - mouseX, mouseY - this.y);
                 this.previousPosition = this.currentPosition;
             }
-
-        }else{
-            if(!(dist(mouseX, mouseY, this.x, this.y) < this.r))
-                dtheta = 0;
         }
 
         push();
@@ -322,6 +319,7 @@ class Button {
             fill(60);
             rect(this.x + this.w / 2 + 2, this.y - this.h / 2 - 2, 2, this.h + 6);
             rect(this.x - this.w / 2 - 4, this.y + this.h / 2 + 2, this.w + 7, 2);
+            //console.log(str(this.x) + ' ' + str(this.w) + ' ' + str(this.y) + ' ' + str(this.h));
             pop();
         }
     }
