@@ -188,7 +188,7 @@ function keyPressed(){
 function mouseWheel(event) {
     for(let i = 0; i < knobs.length; i++)
         if((dist(mouseX, mouseY, knobs[i].x, knobs[i].y) < knobs[i].r))
-            knobs[i].display(event.delta / 3);
+            knobs[i].display(event.delta / 2);
 }
 class Knob{
     constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
