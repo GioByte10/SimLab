@@ -47,9 +47,12 @@ function staticSetup(){
 
     text("Friction " + (friction ? "on" : "off"), windowWidth - 25, 52);
 
+    textSize(20);
     textAlign(LEFT);
     for(let i = 0; i < instructions.length; i++)
         text(instructions[i], 15, 8 + 22 * (i + 1));
+
+    text(particles.length + " p", 15, windowHeight - 20);
 
 }
 function draw(){
