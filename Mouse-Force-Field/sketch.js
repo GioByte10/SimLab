@@ -28,8 +28,7 @@ function setup(){
     fill(120);
 }
 function staticSetup(){
-    textSize(16);
-    fill(100)
+    fill(80)
 
     textAlign(RIGHT);
 
@@ -47,12 +46,14 @@ function staticSetup(){
 
     text("Friction " + (friction ? "on" : "off"), windowWidth - 25, 52);
 
-    textSize(20);
     textAlign(LEFT);
     for(let i = 0; i < instructions.length; i++)
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
+    textSize(20);
     text(particles.length + " p", 15, windowHeight - 20);
+
+    textSize(16);
 
 }
 function draw(){
@@ -64,10 +65,10 @@ function draw(){
     for(let i = 0; i < particles.length; i++)
         particles[i].display();
 
-    if(mode === 1)
+    if(mode === 2)
         unsyncRadial();
 
-    else if(mode === 2)
+    else if(mode === 3)
         syncRadial();
 
 }
@@ -167,6 +168,7 @@ class Particle{
         if(friction)
             this.friction();
 
+        //console.log(this.acceleration.mag());
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
 
@@ -204,11 +206,11 @@ class Particle{
 
     forceField(){
         let force = createVector(mouseX - this.position.x, mouseY - this.position.y).normalize();
-        this.acceleration = force.mult(1 / (this.mass * 10));
+        this.acceleration = force.div(this.mass * 10);
     }
 
     friction(){
-        let force = createVector(this.velocity.x, this.velocity.y).normalize();
-        this.acceleration.add(force.mult(-1 / (this.mass * 100)));
+        let friction = createVector(this.velocity.x, this.velocity.y).normalize();
+        this.acceleration.add(friction.div(-100));
     }
 }
