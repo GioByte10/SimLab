@@ -65,7 +65,6 @@ function setup() {
     sliderCr.style('opacity', '0.4');
 
 }
-
 function staticSetup(){
     fill(150);
     textSize(20);
@@ -87,7 +86,6 @@ function staticSetup(){
         text("Click to add a particle", width / 2, height / 2);
     }
 }
-
 function draw() {
     background(220);
     cr = sliderCr.value();
@@ -102,9 +100,9 @@ function draw() {
     systemEnergy();
     staticSetup();
 }
-
 function systemEnergy(){
     let systemEnergy = 0;
+
     for (let i = 0; i < particles.length; i++)
         systemEnergy += (particles[i].m * particles[i].v.magSq()) / 2;
     systemEnergy /= 1000;
@@ -115,7 +113,6 @@ function systemEnergy(){
     text(round(systemEnergy).toString()+ " zJ", width - 20, 40);
     text(particles.length.toString() + " p", width - 20, 80);
 }
-
 class Particle {
     constructor(x, y, vx, vy, radius, m, color) {
         this.p = createVector(x, y);
@@ -200,7 +197,6 @@ class Particle {
         particle.collisionFrame = frameCount;
     }
 }
-
 function touchStarted() {
     if(mouseX >= 300 || mouseY >= 200) {
         if(mouseX >= width - 80 && mouseY >= height - 55) {
@@ -220,22 +216,18 @@ function touchStarted() {
         }
     }
 }
-
 function mouseWheel(event) {
     if(abs(event.deltaY) > 0)
         n -= abs(event.deltaY) / event.deltaY;
     n = constrain(n, 1, MAX_N)
 }
-
 function keyPressed() {
     if (keyCode === 67)
         clearScreen();
 }
-
 function clearScreen(){
     particles = [];
 }
-
 function createClearButton(){
 
     let clearButton = createButton("Clear");
