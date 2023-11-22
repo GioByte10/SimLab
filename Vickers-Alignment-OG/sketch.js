@@ -162,8 +162,6 @@ function drawFilars(){
     line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 510 / 1280 * imageWidth -windowHeight / 2,
         baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * imageWidth, 510 / 1280 * imageWidth -windowHeight / 2);
 
-    console.log(windowHeight);
-
     pop();
 
 }

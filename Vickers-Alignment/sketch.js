@@ -1,9 +1,7 @@
 let fps = 60;
-let bg;
 let variation;
 
 let knobs = [];
-
 let focus;
 let focusKnob;
 let measuringKnob;
@@ -14,17 +12,67 @@ let inputButton;
 let vertical = true;
 let done = false;
 
-let filarBounds = [[-250, -227, 0, 25], [-185, -150, 55, 96]];
+let filarBounds = [[-315, -285, -40, -8,], [-210, -175, 71, 105]];
 
-let imageHeight;
-let imageWidth;
+let bgHeight;
+let bgWidth;
 
 let videoBack = false;
 let videoForward = false;
 let prevMouse = false;
 
+let matchHeight;
+
+let lensRadius = 150;
+let focusRadius = 70;
+let measuringRadius = 50;
+let baseRadius = 35;
+let bg;
+let sample;
+
+let k = 0;
+let data = {};
+data["time"] = new Date()
+data["time"].setHours(data["time"].getHours() - 8);
+//data["time"].setSeconds(data["time"].getSeconds() + vickersTimestamps["test_steel"]);
+
+
 function preload(){
-    bg = loadImage('images/sample.png');
+    bg = loadImage('images/background_.JPG');
+    sample = loadImage('images/sample_r.png');
+}
+function windowResized(){
+    resizeCanvas(windowWidth, windowHeight);
+
+    if(windowHeight / windowWidth > 2 / 3){
+        matchHeight = true;
+        bgHeight = windowHeight;
+        bgWidth = bgHeight * (3 / 2);
+    }else{
+        matchHeight = false;
+        bgWidth = windowWidth;
+        bgHeight = bgWidth * (2 / 3);
+    }
+
+    focusKnob.x = windowWidth * 9 / 10;
+    focusKnob.y = windowHeight * 8 / 10;
+    focusKnob.r = focusRadius;
+
+    baseKnob.x = windowWidth * 1.5 / 10;
+    baseKnob.y = windowHeight * 1.25 / 10;
+    baseKnob.r = baseRadius;
+
+    measuringKnob.x = windowWidth * 9 / 10;
+    measuringKnob.y = windowHeight * 1.25 / 10;
+    measuringKnob.r = measuringRadius;
+
+    lensKnob.x = windowWidth / 2.1;
+    lensKnob.y = matchHeight ? 0.65 * bgHeight : 0.65 * bgHeight - (bgHeight - windowHeight) / 2;
+    lensKnob.r = lensRadius;
+
+    inputButton.x = windowWidth * 7 / 10;
+    inputButton.y = windowHeight * 1.25 / 10;
+
 }
 function setup(){
     createCanvas(windowWidth, windowHeight);
@@ -35,17 +83,24 @@ function setup(){
     angleMode(DEGREES);
     fill(192);
 
-    imageHeight = min(windowHeight, bg.height)
-    imageWidth = imageHeight * (1280 / 720);
+    if(windowHeight / windowWidth > (2 / 3)){
+        matchHeight = true;
+        bgHeight = windowHeight;
+        bgWidth = bgHeight * (3 / 2);
+    }else{
+        matchHeight = false;
+        bgWidth = windowWidth;
+        bgHeight = bgWidth * (2 / 3);
+    }
 
-    focusKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 2 / 10, windowWidth / 20,
-        -360, 360, 0, 12, 6);
-    baseKnob = new Knob(windowWidth * 1.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
-        -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12, 6)
-    measuringKnob = new Knob(windowWidth * 9.2 / 10, windowHeight * 8 / 10, windowWidth / 20,
-        baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, 6)
-    lensKnob = new Knob(windowWidth / 2, windowHeight / 2, 790 / 1280 * imageWidth / 2,
-    -180, -90, -180, 0, 20, 0, -1);
+    focusKnob = new Knob(windowWidth * 9 / 10, windowHeight * 8 / 10, focusRadius,
+        -360, 360, 0, 0, focusKnobShape);
+    baseKnob = new Knob(windowWidth * 1.5 / 10, windowHeight * 1.25 / 10, baseRadius,
+        -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12, baseKnobShape)
+    measuringKnob = new Knob(windowWidth * 9 / 10, windowHeight * 1.25 / 10, measuringRadius,
+        baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, measuringKnobShape);
+    lensKnob = new Knob(windowWidth / 2.1, matchHeight ? 0.65 * bgHeight : 0.65 * bgHeight - (bgHeight - windowHeight) / 2, lensRadius,
+    -180, -90, -180, 0, lensKnobShape, 7, 0);
 
     knobs.push(focusKnob);
     knobs.push(measuringKnob);
@@ -53,88 +108,77 @@ function setup(){
     knobs.push(lensKnob);
 
     focus = random(focusKnob.lowerTheta, focusKnob.upperTheta);
-    inputButton = new Button(windowWidth * 8.2 / 10, windowHeight * 8 / 10, 40, 40, checkVerticalFilars);
+    inputButton = new Button(windowWidth * 7 / 10, windowHeight * 1.25 / 10, 25, 25, checkVerticalFilars);
     variation = random(-1.5, 1.5);
 }
 function draw(){
     background(0);
+    image(bg, (windowWidth - bgWidth) / 2, (windowHeight - bgHeight) / 2, bgWidth, bgHeight);
 
     blur();
-    drawFilars();
+
     inputButton.display();
 
     for(let i = 0; i < knobs.length; i++)
         knobs[i].display();
 
-    lensOuterKnob();
+    drawFilars();
     staticSetup();
     logs();
     prevMouse = mouseIsPressed;
 
+
 }
 function staticSetup(){
+    push();
     textSize(16);
-    text('Focus', focusKnob.x, focusKnob.y + focusKnob.r * 1.4);
-    text('Base', baseKnob.x, baseKnob.y + baseKnob.r * 1.4);
-    text('Measuring', measuringKnob.x, measuringKnob.y + measuringKnob.r * 1.4);
+    fill(255);
+    text('Focus', focusKnob.x, focusKnob.y + focusKnob.r + 25);
+    text('Base', baseKnob.x, baseKnob.y + baseKnob.r + 25);
+    text('Measuring', measuringKnob.x, measuringKnob.y + measuringKnob.r  + 25);
 
-    text('Input', inputButton.x, measuringKnob.y + measuringKnob.r * 1.4);
+    text('Input', inputButton.x, inputButton.y + inputButton.w / 2 + 25);
 
     if(!vertical)
-        text('Vertical input recorded', windowWidth * 9 / 10, windowHeight * 5.3 / 10);
+        text('Vertical input recorded', windowWidth * 9 / 10, windowHeight * 6 / 10);
 
     textSize(30);
     if(done)
-        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 8.8 / 10, windowHeight * 3 / 10);
-
-}
-function lensOuterKnob(){
-    push();
-    stroke(100);
-    strokeWeight(2);
-    translate(windowWidth / 2, windowHeight / 2);
-    rotate(-lensKnob.theta + 180);
-
-    let l = 72;
-
-    for(let i = 0; i < l; i++)
-        line((lensKnob.r - 9) * cos(360 * i / l), (lensKnob.r - 9) * sin(360 * i / l), (lensKnob.r + 8) * cos(360 * i / l), (lensKnob.r + 8) * sin(360 * i / l));
-
-    noFill();
-    circle(0, 0, lensKnob.r * 2 + 18);
-    circle(0, 0, lensKnob.r * 2 - 20);
+        text(str((206.9 + variation).toFixed(1)) + '  HV0.5', windowWidth * 9 / 10, windowHeight * 3 / 10);
     pop();
+
 }
 function blur(){
     push();
-    drawingContext.filter = 'blur(' + str(abs(focusKnob.theta - focus)) / 30 + 'px)';
-    image(bg, (windowWidth - imageWidth) / 2, (windowHeight - imageHeight) / 2, imageWidth, imageHeight);
+    drawingContext.filter = 'blur(' + str(abs(focusKnob.theta - focus)) / 50 + 'px)';
+    translate(lensKnob.x, lensKnob.y);
+    image(sample, -lensRadius, -lensRadius, 2 * lensRadius, 2 * lensRadius);
     pop();
 }
 function drawFilars(){
 
     push();
-    translate(windowWidth / 2, windowHeight / 2);
+    translate(lensKnob.x, lensKnob.y);
 
     if(!vertical)
         rotate(-lensKnob.theta + 180);
 
     strokeWeight(0.9);
-    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), -imageWidth * (795 / 1280) / 2,
-        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), imageWidth * (795 / 1280) / 2);
+    line(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), -sqrt(lensRadius * lensRadius  -(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta)) ** 2),
+        baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), sqrt(lensRadius * lensRadius  -(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta)) ** 2));
 
-    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * imageWidth * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -imageWidth * (795 / 1280) / 2,
-        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * imageWidth * (795 / 1280) / (measuringKnob.upperTheta - measuringKnob.lowerTheta), imageWidth * (795 / 1280) / 2);
+    line((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * 2 * lensRadius / (measuringKnob.upperTheta - measuringKnob.lowerTheta), -sqrt(lensRadius * lensRadius  -((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * 2 * lensRadius / (measuringKnob.upperTheta - measuringKnob.lowerTheta)) ** 2),
+        (measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * 2 * lensRadius / (measuringKnob.upperTheta - measuringKnob.lowerTheta), sqrt(lensRadius * lensRadius  -((measuringKnob.theta + baseKnob.theta - baseKnob.theta0) * 2 * lensRadius / (measuringKnob.upperTheta - measuringKnob.lowerTheta)) ** 2));
 
     strokeWeight(1.4);
-    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 250 / 1280 * imageWidth - windowHeight / 2,
-        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * imageWidth, 250 / 1280 * imageWidth - windowHeight / 2);
+    line(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), -lensRadius / 3.5,
+        baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) - min(lensRadius / 5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), -lensRadius / 3.5);
 
-    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 380 / 1280 * imageWidth -windowHeight / 2,
-        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 160 / 1280 * imageWidth, 380 / 1280 * imageWidth -windowHeight / 2);
+    line(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), 0,
+        baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) - min(lensRadius / 2.5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), 0);
 
-    line(baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta), 510 / 1280 * imageWidth -windowHeight / 2,
-        baseKnob.theta * imageWidth * (795 / 1280) / (baseKnob.upperTheta - baseKnob.lowerTheta) - 97 / 1280 * imageWidth, 510 / 1280 * imageWidth -windowHeight / 2);
+    line(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), lensRadius / 3.5,
+            baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) -min(lensRadius / 5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), lensRadius / 3.5);
 
     pop();
 
@@ -183,15 +227,12 @@ function keyPressed(){
         videoBack = true;
     }else if(keyCode === RIGHT_ARROW){
         videoForward = true;
+    }else if(keyCode === 68){
+        downloadObjectAsJson(data, "vickers_data");
     }
 }
-function mouseWheel(event) {
-    for(let i = 0; i < knobs.length; i++)
-        if((dist(mouseX, mouseY, knobs[i].x, knobs[i].y) < knobs[i].r))
-            knobs[i].display(event.delta / 2);
-}
 class Knob{
-    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, strokeWeight, stroke = -1, fill = 192){
+    constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, callbackShape = noCallback, strokeWeight = -1, stroke = -1, fill = -1){
         this.x = x;
         this.y = y;
         this.r = r;
@@ -211,6 +252,7 @@ class Knob{
         this.fill = fill;
 
         this.stillPressed = false;
+        this.callbackShape = callbackShape;
     }
 
     display(dtheta = 0){
@@ -238,9 +280,9 @@ class Knob{
         this.theta = constrain(this.theta, this.lowerTheta, this.upperTheta);
         rotate(-this.theta);
 
-        this.stroke >= 0 ? stroke(this.stroke) : linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
+        //this.stroke >= 0 ? stroke(this.stroke) : linearGradient(-this.r * cos(45 + this.theta), -this.r * sin(45 + this.theta), this.r * cos(45 + this.theta), this.r * sin(45 + this.theta), color(230), color(60));
         this.fill >= 0 ? fill(this.fill) : noFill();
-        strokeWeight(this.strokeWeight);
+        this.strokeWeight > 0 ? strokeWeight(this.strokeWeight) : noStroke();
         this.polygon();
 
         if(this.fill >= 0) {
@@ -250,6 +292,9 @@ class Knob{
             line(0, -this.r / 1.8, 0, (-1.5 / 2) * this.r);
         }
         pop();
+
+        this.callbackShape();
+
     }
     polygon() {
         if(this.sides !== 0) {
@@ -326,4 +371,140 @@ class Button {
     setCallback(callback) {
         this.callback = callback;
     }
+}
+function lensKnobShape(){
+    push();
+    stroke(100);
+    strokeWeight(2);
+    translate(lensKnob.x, lensKnob.y);
+    rotate(-lensKnob.theta + 180);
+
+    let l = 72;
+
+    for(let i = 0; i < l; i++)
+        line((lensKnob.r - 4) * cos(360 * i / l), (lensKnob.r - 4) * sin(360 * i / l), (lensKnob.r + 4) * cos(360 * i / l), (lensKnob.r + 4) * sin(360 * i / l));
+
+    noFill();
+    circle(0, 0, lensKnob.r * 2 + 9);
+    circle(0, 0, lensKnob.r * 2 - 9);
+    pop();
+}
+function focusKnobShape(){
+    push();
+    translate(focusKnob.x, focusKnob.y);
+    rotate(-focusKnob.theta);
+
+    stroke(120);
+    strokeWeight(2);
+    fill(20);
+    circle(0, 0, focusKnob.r * 2);
+    circle(0, 0, focusKnob.r * 2 * 0.85);
+    circle(0, -focusKnob.r * 0.5, focusKnob.r * 0.3);
+
+    pop();
+}
+function measuringKnobShape(){
+    push();
+    translate(measuringKnob.x, measuringKnob.y);
+    rotate(-measuringKnob.theta);
+
+    noStroke();
+    fill(20);
+    let numTeeth = 70;
+    let teethHeight = 2;
+
+
+    for (let i = 0; i < numTeeth; i++) {
+        let x1 = measuringKnob.r * cos(i * 360/numTeeth);
+        let y1 = measuringKnob.r * sin(i * 360/numTeeth);
+        let x2 = measuringKnob.r * cos((i + 1) * 360/numTeeth);
+        let y2 = measuringKnob.r * sin((i + 1) * 360/numTeeth);
+        let x3 = (measuringKnob.r + teethHeight) * cos((i + 0.5) * 360/numTeeth);
+        let y3 = (measuringKnob.r + teethHeight) * sin((i + 0.5) * 360/numTeeth);
+
+        triangle(x1, y1, x2, y2, x3, y3);
+    }
+
+    fill(20);
+    stroke(100);
+    circle(0, 0, measuringKnob.r * 2);
+    circle(0, 0, measuringKnob.r * 2 * 0.85);
+
+    pop();
+}
+function baseKnobShape(){
+    push();
+    translate(baseKnob.x, baseKnob.y);
+    rotate(-baseKnob.theta);
+
+    noStroke();
+    fill(20);
+    let numTeeth = 50;
+    let teethHeight = 2;
+
+
+    for (let i = 0; i < numTeeth; i++) {
+        let x1 = baseKnob.r * cos(i * 360/numTeeth);
+        let y1 = baseKnob.r * sin(i * 360/numTeeth);
+        let x2 = baseKnob.r * cos((i + 1) * 360/numTeeth);
+        let y2 = baseKnob.r * sin((i + 1) * 360/numTeeth);
+        let x3 = (baseKnob.r + teethHeight) * cos((i + 0.5) * 360/numTeeth);
+        let y3 = (baseKnob.r + teethHeight) * sin((i + 0.5) * 360/numTeeth);
+
+        triangle(x1, y1, x2, y2, x3, y3);
+    }
+
+    fill(20);
+    stroke(100);
+    circle(0, 0, baseKnob.r * 2);
+    circle(0, 0, baseKnob.r * 2 * 0.85);
+
+    pop();
+}
+function downloadObjectAsJson(exportObj, exportName){
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+    let downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download", exportName + ".json");
+    document.body.appendChild(downloadAnchorNode); // required for firefox
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+function mouseWheel(event) {
+    for(let i = 0; i < knobs.length; i++)
+        if((dist(mouseX, mouseY, knobs[i].x, knobs[i].y) < knobs[i].r)) {
+            knobs[i].display(event.delta / 2);
+            data[k] = [performance.now(), "mouseWheel", event.delta];
+            k++;
+        }
+}
+function mousePressed(){
+    data[k] = [performance.now(), "mousePressed"];
+    k++;
+}
+function mouseMoved(){
+    data[k] = [performance.now(), "mouseMoved"];
+    k++;
+}
+function reset(){
+    data = {};
+    k = 0;
+
+    vertical = true;
+    done = false;
+
+    videoBack = false;
+    videoForward = false;
+    prevMouse = false;
+
+    inputButton.setCallback(checkVerticalFilars);
+
+    focusKnob.theta = 0;
+    baseKnob.theta = random(-1.8 * 360, 0);
+    measuringKnob.theta = random(baseKnob.theta0, 1.7 * 360);
+    lensKnob.theta = -180;
+
+    focus = random(focusKnob.lowerTheta, focusKnob.upperTheta);
+    variation = random(-1.5, 1.5);
+
 }
