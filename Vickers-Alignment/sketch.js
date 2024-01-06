@@ -23,7 +23,7 @@ let prevMouse = false;
 
 let matchHeight;
 
-let lensRadius = 150;
+let lensRadius = 135;
 let focusRadius = 70;
 let measuringRadius = 50;
 let baseRadius = 35;
@@ -38,7 +38,7 @@ data["time"].setHours(data["time"].getHours() - 8);
 
 
 function preload(){
-    bg = loadImage('images/background_.JPG');
+    bg = loadImage('images/background_.jpg');
     sample = loadImage('images/sample_r.png');
 }
 function windowResized(){
@@ -55,15 +55,15 @@ function windowResized(){
     }
 
     focusKnob.x = windowWidth * 9 / 10;
-    focusKnob.y = windowHeight * 8 / 10;
+    focusKnob.y = matchHeight ? 0.71 * bgHeight : 0.71 * bgHeight - (bgHeight - windowHeight) / 2;
     focusKnob.r = focusRadius;
 
     baseKnob.x = windowWidth * 1.5 / 10;
-    baseKnob.y = windowHeight * 1.25 / 10;
+    baseKnob.y = matchHeight ? 0.185 * bgHeight : 0.185 * bgHeight - (bgHeight - windowHeight) / 2;
     baseKnob.r = baseRadius;
 
     measuringKnob.x = windowWidth * 9 / 10;
-    measuringKnob.y = windowHeight * 1.25 / 10;
+    measuringKnob.y = matchHeight ? 0.184 * bgHeight : 0.184 * bgHeight - (bgHeight - windowHeight) / 2;
     measuringKnob.r = measuringRadius;
 
     lensKnob.x = windowWidth / 2.1;
@@ -71,7 +71,7 @@ function windowResized(){
     lensKnob.r = lensRadius;
 
     inputButton.x = windowWidth * 7 / 10;
-    inputButton.y = windowHeight * 1.25 / 10;
+    inputButton.y = matchHeight ? 0.184 * bgHeight : 0.184 * bgHeight - (bgHeight - windowHeight) / 2;
 
 }
 function setup(){
@@ -93,11 +93,11 @@ function setup(){
         bgHeight = bgWidth * (2 / 3);
     }
 
-    focusKnob = new Knob(windowWidth * 9 / 10, windowHeight * 8 / 10, focusRadius,
+    focusKnob = new Knob(windowWidth * 9 / 10, matchHeight ? 0.71 * bgHeight : 0.71 * bgHeight - (bgHeight - windowHeight) / 2, focusRadius,
         -360, 360, 0, 0, focusKnobShape);
-    baseKnob = new Knob(windowWidth * 1.5 / 10, windowHeight * 1.25 / 10, baseRadius,
+    baseKnob = new Knob(windowWidth * 1.5 / 10, matchHeight ? 0.185 * bgHeight : 0.185 * bgHeight - (bgHeight - windowHeight) / 2, baseRadius,
         -2 * 360, 2 * 360, random(-1.8 * 360, 0), 12, baseKnobShape)
-    measuringKnob = new Knob(windowWidth * 9 / 10, windowHeight * 1.25 / 10, measuringRadius,
+    measuringKnob = new Knob(windowWidth * 9 / 10, matchHeight ? 0.184 * bgHeight : 0.184 * bgHeight - (bgHeight - windowHeight) / 2, measuringRadius,
         baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, measuringKnobShape);
     lensKnob = new Knob(windowWidth / 2.1, matchHeight ? 0.65 * bgHeight : 0.65 * bgHeight - (bgHeight - windowHeight) / 2, lensRadius,
     -180, -90, -180, 0, lensKnobShape, 7, 0);
@@ -108,8 +108,9 @@ function setup(){
     knobs.push(lensKnob);
 
     focus = random(focusKnob.lowerTheta, focusKnob.upperTheta);
-    inputButton = new Button(windowWidth * 7 / 10, windowHeight * 1.25 / 10, 25, 25, checkVerticalFilars);
+    inputButton = new Button(windowWidth * 7 / 10, matchHeight ? 0.184 * bgHeight : 0.184 * bgHeight - (bgHeight - windowHeight) / 2, 25, 25, checkVerticalFilars);
     variation = random(-1.5, 1.5);
+
 }
 function draw(){
     background(0);
@@ -126,8 +127,37 @@ function draw(){
     staticSetup();
     logs();
     prevMouse = mouseIsPressed;
+    displayArrows();
+}
+function displayArrows(){
+    displayArrow(baseKnob, createVector(matchHeight ? 0.4 * bgWidth - (bgWidth - windowWidth) / 2 : 0.4 * bgWidth, baseKnob.y), color(0));
+    displayArrow(focusKnob, createVector(matchHeight ? 0.61 * bgWidth - (bgWidth - windowWidth) / 2 : 0.61 * bgWidth, focusKnob.y), color(200));
+    displayArrow(inputButton, createVector(matchHeight ? 0.61 * bgWidth - (bgWidth - windowWidth) / 2 : 0.61 * bgWidth, inputButton.y), color(0));
+}
+function displayArrow(element, end, color){
 
+    push();
+    strokeWeight(2);
+    stroke(color.levels[0]);
 
+    let dR = end.copy();
+    dR.x -= element.x;
+    dR.y -= element.y;
+
+    line(element.x + (dR.x > 0 ? element.r + 20 : -element.r -20), element.y, end.x + (dR.x > 0 ? -12 : 12), end.y);
+    translate(end.x + (dR.x > 0 ? -12 : 12), end.y);
+
+    rotate(dR.heading());
+
+    beginShape();
+    noFill();
+
+    vertex(-6, -5);
+    vertex(0, 0);
+    vertex(-6, 5);
+
+    endShape();
+    pop();
 }
 function staticSetup(){
     push();
@@ -317,6 +347,7 @@ class Button {
         this.y = y;
         this.w = w;
         this.h = h
+        this.r = w / 2;
         this.callback = callback;
     }
 
@@ -486,9 +517,7 @@ function mouseMoved(){
     data[k] = [performance.now(), "mouseMoved"];
     k++;
 }
-function reset(){
-    data = {};
-    k = 0;
+function resetInteractive(){
 
     vertical = true;
     done = false;
