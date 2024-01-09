@@ -8,11 +8,14 @@ let us = 0.3;
 let uk = 0.1;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  angleMode(DEGREES);
-  frameRate(60);
+    createCanvas(windowWidth, windowHeight);
+    angleMode(DEGREES);
+    frameRate(60);
 
-  spring = new Spring(3, 1, r);
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
+        pixelDensity(1);
+
+    spring = new Spring(3, 1, r);
 }
 
 function draw() {
