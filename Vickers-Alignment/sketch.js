@@ -80,6 +80,9 @@ function setup(){
     textAlign(CENTER);
     textSize(16);
 
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
+        pixelDensity(1);
+
     angleMode(DEGREES);
     fill(192);
 

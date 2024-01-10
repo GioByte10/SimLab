@@ -43,9 +43,8 @@ function setup() {
 
     hm = width > height;
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
-
 
     w = createVector(0, 0, 0.012);
 

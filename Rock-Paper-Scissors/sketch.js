@@ -28,7 +28,7 @@ function setup(){
     textAlign(CENTER);
     frameRate(fps);
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
     for(let i = 0; i < n; i++)

@@ -20,6 +20,9 @@ function setup() {
   createCanvas(windowWidth, windowHeight, SVG);
   frameRate(fps);
 
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
+        pixelDensity(1);
+
   textSize(24);
   textFont("monospace");
   imageMode(CENTER);

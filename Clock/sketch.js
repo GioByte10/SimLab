@@ -20,7 +20,7 @@ function setup() {
 
     r = min(width, height) / 3.5;
 
-    if(navigator.userAgent.match(/iPhone|iPod|Android|BlackBerry|Windows Phone/i))
+    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
     angle = cmd * 6 + chd * 360;

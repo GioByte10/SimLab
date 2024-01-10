@@ -65,6 +65,7 @@ function setup() {
     sliderCr.style('opacity', '0.4');
 
 }
+
 function staticSetup(){
     fill(150);
     textSize(20);
