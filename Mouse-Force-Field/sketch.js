@@ -51,7 +51,7 @@ function staticSetup(){
         text(instructions[i], 15, 8 + 22 * (i + 1));
 
     textSize(20);
-    text(n + " p", 15, windowHeight - 85);
+    text(particles.length + " p", 15, windowHeight - 85);
 
     if(displayVector) {
         fill(160);
