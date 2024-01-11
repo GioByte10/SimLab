@@ -185,12 +185,12 @@ function mouseWheel(event) {
         if (abs(event.deltaY) > 0)
             VECTOR_N -= (abs(event.deltaY) / event.deltaY);
 
-        VECTOR_N = constrain(VECTOR_N, 0, Infinity);
+        VECTOR_N = constrain(VECTOR_N, 2, Infinity);
     }else{
         if (abs(event.deltaY) > 0)
             n -= (abs(event.deltaY) / event.deltaY);
 
-        n = constrain(n, 0, 255);
+        n = constrain(n, 1, 255);
     }
 }
 
