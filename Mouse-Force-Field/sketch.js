@@ -17,8 +17,6 @@ let friction = false;
 let VECTOR_N = 20;
 let vectorField;
 
-const pressed = new Set()
-
 const instructions = [
     "Press the left and right arrow keys to change modes",
     "Press C to clear the screen",
