@@ -1,7 +1,17 @@
 const FPS = 60;
 let dropdowns = [];
-let Sut;
-let Sy;
+let textBoxes = [];
+
+let Sut = 0;
+let Sy = 0;
+let Se;
+let von;
+let Mm = 0;
+let Ma = 0;
+let Tm = 0
+let Ta = 0;
+let kb;
+let T;
 
 let D = 300;
 let d = 180;
@@ -10,12 +20,28 @@ let r = 40;
 let L = 260;
 let l = 300;
 
+let done = false
+
+let mpaToKsi = 1;
+let unitStr = "MPa";
+
+// Creating enums below
+
 const dropdownTypes = {
     MATERIAL: 0,
     UNITS: 1,
     FILLET: 2
 };
 const {MATERIAL, UNITS, FILLET} = dropdownTypes;
+
+const textBoxesTypes ={
+    MM: 0,
+    MA: 1,
+    TM: 2,
+    TA: 3,
+    TEMP: 4
+};
+const {MM, MA, TM, TA, TEMP} = textBoxesTypes;
 
 const strengthType = {
     SUT: 1,
@@ -51,24 +77,41 @@ let materialsMap = {
     "ASTM 1050 CD": [ASTM, 690, 580],
     "ASTM 1060 HR": [ASTM, 680, 370],
     "ASTM 1080 HR": [ASTM, 770, 420],
-    "ASTM 1095 HR": [ASTM, 830, 460],
-}
+    "ASTM 1095 HR": [ASTM, 830, 460]
+};
 
 function windowResized(){
     createCanvas(windowWidth, windowHeight);
     removeDropdowns();
     createDropdowns();
+
+    removeTextBoxes();
+    createTextBoxes();
 }
 
 function staticSetup(){
     push();
 
     textAlign(LEFT, CENTER);
-    textSize(18);
-    text("Sut = " + Sut, dropdowns[MATERIAL].x + 150, dropdowns[MATERIAL].y + 12);
-    text("Sy = " + Sy, dropdowns[MATERIAL].x + 150 + 100, dropdowns[MATERIAL].y + 12);
+    textSize(20);
+    text("Sut = " + round(Sut * mpaToKsi) + ' ' + unitStr, dropdowns[MATERIAL].x + 170, dropdowns[MATERIAL].y + 13);
+    text("Sy = " + round(Sy * mpaToKsi) + ' ' + unitStr, dropdowns[MATERIAL].x + 170 + 150, dropdowns[MATERIAL].y + 13);
 
-    pop()
+    text("Mₘ = ", textBoxes[MM].position().x - 53, textBoxes[MM].position().y + 12);
+    text(unitStr, textBoxes[MM].position().x + 70, textBoxes[MM].position().y + 12);
+
+    text("Mₐ = ", textBoxes[MA].position().x - 53, textBoxes[MA].position().y + 12);
+    text(unitStr, textBoxes[MA].position().x + 70, textBoxes[MA].position().y + 12);
+
+    text("Tₐ = ", textBoxes[TA].position().x - 53, textBoxes[TA].position().y + 12);
+    text(unitStr, textBoxes[TA].position().x + 70, textBoxes[TA].position().y + 12);
+
+    text("Tₘ = ", textBoxes[TM].position().x - 53, textBoxes[TM].position().y + 12);
+    text(unitStr, textBoxes[TM].position().x + 70, textBoxes[TM].position().y + 12);
+
+    text(Mm, 200, 200);
+
+    pop();
 }
 
 function setup(){
@@ -84,12 +127,29 @@ function setup(){
 function draw(){
     background(220);
     staticSetup();
+
     sketchShaft();
+    runTextBoxes();
+    calculateStresses();
+}
+
+function calculateStresses(){
+    let ka = (textBoxes[MATERIAL].value().includes("CD") ? 4.51 : 57.7) * Sut ** (textBoxes[MATERIAL].value().includes("CD") ? -0.265 : -0.718);
+    kb = (kb === undefined ? 0.85 :
+        d < 2.79 ? 1.11107157093 :
+        d >= 2.79 && d <= 51 ? 1.24 * d ** -0.107 :
+        d > 51 && d <= 254 ? 1.51 * d ** -0.157 :
+        0.633020906906);
+    let kc = 1;
+    let kd = 0.975 + (0.432 * T * 10 ** -3) - (0.115 * T ** 2 * 10 ** -5) + (0.104 * T ** 3 * 10 ** -8) - (0.595 * T ** 4 * 10 ** -12);
+
+    text(kd, 500, 600);
 }
 
 function sketchShaft(){
 
     push();
+
     noFill();
     stroke(0);
     translate(0.5 * (width - (L + l)), 0.5 * (height - D) - 100);
@@ -123,7 +183,7 @@ function sketchShaft(){
 function createDropdowns(){
 
     for(const key in dropdownTypes) {
-        dropdowns.push(createSelect().style("font-size", "15px"));
+        dropdowns.push(createSelect().style("font-size", "18px"));
     }
 
     for(const key in materialsMap)
@@ -135,17 +195,46 @@ function createDropdowns(){
     dropdowns[MATERIAL].changed(() => {
         Sut = materialsMap[dropdowns[MATERIAL].value()][SUT];
         Sy = materialsMap[dropdowns[MATERIAL].value()][SY];
+        done = false;
     });
 
     dropdowns[UNITS].option("Metric");
     dropdowns[UNITS].option("Imperial");
 
+    dropdowns[UNITS].changed(() => {
+       mpaToKsi = dropdowns[UNITS].value() === "Metric" ? 1 : 0.1450377377;
+       unitStr = dropdowns[UNITS].value() === "Metric" ? "MPa" : "ksi";
+    });
+
     dropdowns[FILLET].option("sharp");
     dropdowns[FILLET].option("well rounded");
+
+    dropdowns[FILLET].changed(() => {
+       done = false;
+    });
 
     dropdowns[UNITS].position(width - 120, 40);
     dropdowns[MATERIAL].position(50, 40);
     dropdowns[FILLET].position(0.5 * (width - (L + l)) + L + r, 0.5 * (height - D) - 100 + 0.5 * (d - D) + r + D - 10);
+}
+
+function createTextBoxes(){
+    for(const keys in textBoxesTypes)
+        textBoxes.push(createInput().size(50, 16));
+
+    textBoxes[MM].position(105, 0.4 * height);
+    textBoxes[MA].position(320, 0.4 * height);
+    textBoxes[TM].position(105, 0.4 * height + 40);
+    textBoxes[TA].position(320, 0.4 * height + 40);
+    textBoxes[TEMP].position(500, 500);
+}
+
+function runTextBoxes(){
+    Mm = textBoxes[MM].value() * mpaToKsi;
+    Ma = textBoxes[MA].value() * mpaToKsi;
+    T = textBoxes[TEMP].value();
+
+    T = dropdowns[UNITS].value() === "Metric" ? T * 9 / 5 + 32 : T;
 }
 
 function removeDropdowns(){
@@ -153,4 +242,11 @@ function removeDropdowns(){
         dropdowns[i].remove();
 
     dropdowns = [];
+}
+
+function removeTextBoxes(){
+    for(let i = 0; i < textBoxes.length; i++)
+        textBoxes[i].remove();
+
+    textBoxes = [];
 }
