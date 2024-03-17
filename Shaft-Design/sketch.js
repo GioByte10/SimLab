@@ -1,32 +1,36 @@
 const FPS = 60;
 let dropdowns = [];
 let textBoxes = [];
+let iterationHistory = [];
+let it = 0;
 
-let Sut = 0;
-let Sy = 0;
-let Se;
-let von;
-let Mm = 0;
-let Ma = 0;
-let Tm = 0
-let Ta = 0;
-let kb;
-let T;
+let Sut;
+let Sy;
 
-let D = 300;
-let d = 180;
-let r = 40;
+let rd;
+let Dd = 1.2;
+let D;
+let d;
+let prevd;
+let nf = 1.5;
+let ny;
 
+let sD = 300;
+let sd = 180;
+let sr = 40;
 let L = 260;
 let l = 300;
 
-let done = false
-
-let mpaToKsi = 1;
-let unitStr = "MPa";
+let changedTemp = false;
+let stressC = 6.894759;
+let momentC = 8.8507;
+let lengthC = 25.4;
+let stressUnit = "MPa";
+let momentUnit = "N-m";
+let lengthUnit = "mm";
+let temperatureUnit = "°C"
 
 // Creating enums below
-
 const dropdownTypes = {
     MATERIAL: 0,
     UNITS: 1,
@@ -39,9 +43,11 @@ const textBoxesTypes ={
     MA: 1,
     TM: 2,
     TA: 3,
-    TEMP: 4
+    TEMP: 4,
+    RE: 5,
+    FOS: 6
 };
-const {MM, MA, TM, TA, TEMP} = textBoxesTypes;
+const {MM, MA, TM, TA, TEMP, RE, FOS} = textBoxesTypes;
 
 const strengthType = {
     SUT: 1,
@@ -55,33 +61,35 @@ const materialType = {
 const {ASTM} = materialType;
 
 let materialsMap = {
-    "ASTM 1006 HR": [ASTM, 300, 170],
-    "ASTM 1006 CD": [ASTM, 330, 280],
-    "ASTM 1010 HR": [ASTM, 320, 180],
-    "ASTM 1010 CD": [ASTM, 370, 300],
-    "ASTM 1015 HR": [ASTM, 340, 190],
-    "ASTM 1015 CD": [ASTM, 390, 320],
-    "ASTM 1018 HR": [ASTM, 400, 220],
-    "ASTM 1018 CD": [ASTM, 440, 370],
-    "ASTM 1020 HR": [ASTM, 380, 210],
-    "ASTM 1020 CD": [ASTM, 470, 390],
-    "ASTM 1030 HR": [ASTM, 470, 260],
-    "ASTM 1030 CD": [ASTM, 520, 440],
-    "ASTM 1035 HR": [ASTM, 500, 270],
-    "ASTM 1035 CD": [ASTM, 550, 460],
-    "ASTM 1040 HR": [ASTM, 520, 290],
-    "ASTM 1040 CD": [ASTM, 590, 490],
-    "ASTM 1045 HR": [ASTM, 570, 310],
-    "ASTM 1045 CD": [ASTM, 630, 530],
-    "ASTM 1050 HR": [ASTM, 620, 340],
-    "ASTM 1050 CD": [ASTM, 690, 580],
-    "ASTM 1060 HR": [ASTM, 680, 370],
-    "ASTM 1080 HR": [ASTM, 770, 420],
-    "ASTM 1095 HR": [ASTM, 830, 460]
+    "ASTM 1006 HR": [ASTM, 43, 24],
+    "ASTM 1006 CD": [ASTM, 48, 41],
+    "ASTM 1010 HR": [ASTM, 47, 26],
+    "ASTM 1010 CD": [ASTM, 53, 44],
+    "ASTM 1015 HR": [ASTM, 50, 27.5],
+    "ASTM 1015 CD": [ASTM, 56, 47],
+    "ASTM 1018 HR": [ASTM, 58, 32],
+    "ASTM 1018 CD": [ASTM, 64, 54],
+    "ASTM 1020 HR": [ASTM, 55, 30],
+    "ASTM 1020 CD": [ASTM, 68, 57],
+    "ASTM 1030 HR": [ASTM, 68, 37.5],
+    "ASTM 1030 CD": [ASTM, 76, 64],
+    "ASTM 1035 HR": [ASTM, 72, 39.5],
+    "ASTM 1035 CD": [ASTM, 80, 67],
+    "ASTM 1040 HR": [ASTM, 76, 42],
+    "ASTM 1040 CD": [ASTM, 85, 71],
+    "ASTM 1045 HR": [ASTM, 82, 45],
+    "ASTM 1045 CD": [ASTM, 91, 77],
+    "ASTM 1050 HR": [ASTM, 90, 49.5],
+    "ASTM 1050 CD": [ASTM, 100, 84],
+    "ASTM 1060 HR": [ASTM, 98, 54],
+    "ASTM 1080 HR": [ASTM, 112, 61.5],
+    "ASTM 1095 HR": [ASTM, 120, 66],
+    "Custom CD" : [ASTM, 75, 50]
 };
 
 function windowResized(){
     createCanvas(windowWidth, windowHeight);
+
     removeDropdowns();
     createDropdowns();
 
@@ -94,22 +102,28 @@ function staticSetup(){
 
     textAlign(LEFT, CENTER);
     textSize(20);
-    text("Sut = " + round(Sut * mpaToKsi) + ' ' + unitStr, dropdowns[MATERIAL].x + 170, dropdowns[MATERIAL].y + 13);
-    text("Sy = " + round(Sy * mpaToKsi) + ' ' + unitStr, dropdowns[MATERIAL].x + 170 + 150, dropdowns[MATERIAL].y + 13);
+    text("Sut = " + round(Sut * stressC) + ' ' + stressUnit, dropdowns[MATERIAL].x + 170, dropdowns[MATERIAL].y + 13);
+    text("Sy = " + round(Sy * stressC) + ' ' + stressUnit, dropdowns[MATERIAL].x + 170 + 150, dropdowns[MATERIAL].y + 13);
 
     text("Mₘ = ", textBoxes[MM].position().x - 53, textBoxes[MM].position().y + 12);
-    text(unitStr, textBoxes[MM].position().x + 70, textBoxes[MM].position().y + 12);
+    text(momentUnit, textBoxes[MM].position().x + 70, textBoxes[MM].position().y + 12);
 
     text("Mₐ = ", textBoxes[MA].position().x - 53, textBoxes[MA].position().y + 12);
-    text(unitStr, textBoxes[MA].position().x + 70, textBoxes[MA].position().y + 12);
+    text(momentUnit, textBoxes[MA].position().x + 70, textBoxes[MA].position().y + 12);
 
     text("Tₐ = ", textBoxes[TA].position().x - 53, textBoxes[TA].position().y + 12);
-    text(unitStr, textBoxes[TA].position().x + 70, textBoxes[TA].position().y + 12);
+    text(momentUnit, textBoxes[TA].position().x + 70, textBoxes[TA].position().y + 12);
 
     text("Tₘ = ", textBoxes[TM].position().x - 53, textBoxes[TM].position().y + 12);
-    text(unitStr, textBoxes[TM].position().x + 70, textBoxes[TM].position().y + 12);
+    text(momentUnit, textBoxes[TM].position().x + 70, textBoxes[TM].position().y + 12);
 
-    text(Mm, 200, 200);
+    text(temperatureUnit, textBoxes[TEMP].position().x + 70, textBoxes[TEMP].position().y + 12);
+
+    text("%", textBoxes[RE].position().x + 70, textBoxes[RE].position().y + 12);
+
+    text("nf = ", textBoxes[FOS].position().x - 50, textBoxes[FOS].position().y + 12);
+    if (!isNaN(ny))
+        text("ny = " + ny.toFixed(2), textBoxes[FOS].position().x - 50, textBoxes[FOS].position().y + 50);
 
     pop();
 }
@@ -129,21 +143,62 @@ function draw(){
     staticSetup();
 
     sketchShaft();
-    runTextBoxes();
-    calculateStresses();
+    if(d === undefined || prevd === undefined || (d - prevd) / prevd > 0.001)
+        calculate();
 }
 
-function calculateStresses(){
-    let ka = (textBoxes[MATERIAL].value().includes("CD") ? 4.51 : 57.7) * Sut ** (textBoxes[MATERIAL].value().includes("CD") ? -0.265 : -0.718);
-    kb = (kb === undefined ? 0.85 :
-        d < 2.79 ? 1.11107157093 :
-        d >= 2.79 && d <= 51 ? 1.24 * d ** -0.107 :
-        d > 51 && d <= 254 ? 1.51 * d ** -0.157 :
-        0.633020906906);
+function calculate(){
+
+    it = d === undefined ? 0 : it + 1;
+    prevd = d === undefined ? undefined : d;
+    let Kt = d === undefined ? (rd === 0.02 ?  2.7 : 1.7) : (0.97098 * rd ** -0.21796);
+    let Kts = d === undefined ? (rd === 0.02 ? 2.2 : 1.5) : (0.83425 * rd ** -0.21649);
+    let T = dropdowns[UNITS].value() === "Metric" ? textBoxes[TEMP].value() * 9 / 5 + 32 : textBoxes[TEMP].value();
+
+    let ka = (dropdowns[MATERIAL].value().includes("CD") ? 2.7 : 14.4) * Sut ** (dropdowns[MATERIAL].value().includes("CD") ? -0.265 : -0.718);
+    let kb = (d === undefined ? 0.85 :
+        d < 0.11 ? 1.11316580719 :
+        d >= 0.11 && d <= 2 ? 0.879 * d ** -0.107 :
+        d > 2 && d <= 10 ? 0.91 * d ** -0.157 :
+        0.633930127841);
     let kc = 1;
     let kd = 0.975 + (0.432 * T * 10 ** -3) - (0.115 * T ** 2 * 10 ** -5) + (0.104 * T ** 3 * 10 ** -8) - (0.595 * T ** 4 * 10 ** -12);
+    let ke = 1 - 0.08 * jStat.normal.inv(textBoxes[RE].value() / 100, 0, 1);
+    let kf = 1;
 
-    text(kd, 500, 600);
+    //console.log(70);
+
+    let Sep = Sut <= 200 ? 0.5 * Sut : 100;
+    let Se = ka * kb * kc * kd * ke * kf * Sep;
+
+    let a_sqrt = 0.246 - (3.08 * 10 ** -3 * Sut) + (1.51 * 10 ** -5 * Sut ** 2) - (2.67 * 10 ** -8 * Sut ** 3);
+    let as_sqrt = 0.190 - (2.51 * 10 ** -3 * Sut) + (1.35 * 10 ** -5 * Sut ** 2) - (2.67 * 10 ** -8 * Sut ** 3);
+
+    let r = d === undefined ? 0 : rd * d;
+    let Kf = d === undefined ? Kt : 1 + (Kt - 1) / (1 + a_sqrt / sqrt(r));
+    let Kfs = d === undefined ? Kts : 1 + (Kt - 1) / (1 + as_sqrt / sqrt(r));
+
+    let Mm = textBoxes[MM].value() * momentC;
+    let Ma = textBoxes[MA].value() * momentC;
+    let Tm = textBoxes[TM].value() * momentC;
+    let Ta = textBoxes[TA].value() * momentC;
+
+    d = de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs);
+    if(d !== 0)
+        iterationHistory[it] = (it + 1) + ". d = " + (d * lengthC).toFixed(2) + ' ' + lengthUnit +
+        "  D = " + (Dd * d * lengthC).toFixed(2) + ' ' + lengthUnit +
+        "  r = " + (rd * d * lengthC).toFixed(2) + ' ' + lengthUnit;
+
+    let von_a = sqrt(sq((32 * Kf * Ma) / (PI * d ** 3)) + 3 * sq((16 * Kfs * Ta) / (PI * d ** 3)));
+    let von_m = sqrt(sq((32 * Kf * Mm) / (PI * d ** 3)) + 3 * sq((16 * Kfs * Tm) / (PI * d ** 3)));
+    ny = (Sy * 1000) / (von_a + von_m);
+
+}
+
+function de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs){
+    return Math.pow((16 * nf / PI) *
+        ((1 / (Se * 1000)) * sqrt(4 * (Kf * Ma) ** 2 + 3 * (Kfs * Ta) ** 2) +
+        (1 / (Sut * 1000)) * sqrt(4 * (Kf * Mm) ** 2 + 3 * (Kfs * Tm) ** 2)), 1 / 3);
 }
 
 function sketchShaft(){
@@ -152,32 +207,64 @@ function sketchShaft(){
 
     noFill();
     stroke(0);
-    translate(0.5 * (width - (L + l)), 0.5 * (height - D) - 100);
+    translate(0.4 * (width - (L + l)), 0.5 * (height - sD) - 100);
 
     fill("#c6eafa");
     beginShape();
     vertex(0, 0);
     vertex(L, 0);
-    vertex(L, 0.5 * (D -d));
-    vertex(L + l, 0.5 * (D - d));
-    vertex(L + l, 0.5 * (D - d) + d);
-    vertex(L, 0.5 * (D - d) + d)
-    vertex(L, D);
-    vertex(0, D);
+    vertex(L, 0.5 * (sD -sd));
+    vertex(L + l, 0.5 * (sD - sd));
+    vertex(L + l, 0.5 * (sD - sd) + sd);
+    vertex(L, 0.5 * (sD - sd) + sd)
+    vertex(L, sD);
+    vertex(0, sD);
     endShape(CLOSE);
 
+    stroke(0);
+    strokeWeight(1);
+    line(L / 2, sD / 2 - 35, L / 2, 0);
+    drawArrowHead(L / 2, 0, -90);
+
+    line(L / 2, sD / 2 + 35, L / 2, sD);
+    drawArrowHead(L / 2, sD, 90);
+
+    line(L + l / 2, sD / 2 - 35, L + l / 2, (sD - sd) / 2);
+    drawArrowHead(L + l / 2, (sD - sd) / 2, -90);
+
+    line(L + l / 2, sD / 2 + 35, L  + l / 2, sD - (sD - sd) / 2);
+    drawArrowHead(L + l / 2, sD - (sD - sd) / 2, 90);
+
     noStroke();
-    rect(L - 1, 0.5 * (D - d) - r + 1, r, r);
-    rect(L - 1, 0.5 * (d - D) + D - 1, r, r);
+    rect(L - 1, 0.5 * (sD - sd) - sr + 1, sr, sr);
+    rect(L - 1, 0.5 * (sd - sD) + sD - 1, sr, sr);
 
     strokeWeight(1);
     stroke(0);
     fill(220);
-    arc(L + r, 0.5 * (D - d) - r, 2 * r, 2 * r, 89, 181);
-    arc(L + r, 0.5 * (d - D) + r + D, 2 * r, 2 * r, 179, 271);
+    arc(L + sr, 0.5 * (sD - sd) - sr, 2 * sr, 2 * sr, 89, 181);
+    arc(L + sr, 0.5 * (sd - sD) + sr + sD, 2 * sr, 2 * sr, 179, 271);
+
+    line(L + sr, 0.5 * (sD - sd) - sr, L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr);
+    drawArrowHead(L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr, 135)
+
+    noStroke();
+    fill(0);
+    textSize(18);
+    textAlign(CENTER, CENTER);
+    text((d * lengthC).toFixed(2) + ' ' + lengthUnit, L + l/ 2, sD / 2);
+    text((d * Dd * lengthC).toFixed(2) + ' ' + lengthUnit, L / 2, sD / 2);
+    text((d * rd * lengthC).toFixed(2) + ' ' + lengthUnit, L + sr + 30,0)
+
+    textAlign(LEFT);
+
+    if(iterationHistory.length > 0)
+        text("Iterations: ", L + l + 120, 100);
+
+    for(let i = 0; i < iterationHistory.length; i++)
+        text(iterationHistory[i], L + l + 120, 125 + i * 25);
 
     pop();
-
 }
 
 function createDropdowns(){
@@ -195,46 +282,91 @@ function createDropdowns(){
     dropdowns[MATERIAL].changed(() => {
         Sut = materialsMap[dropdowns[MATERIAL].value()][SUT];
         Sy = materialsMap[dropdowns[MATERIAL].value()][SY];
-        done = false;
+        d = undefined;
+        prevd = undefined;
     });
 
     dropdowns[UNITS].option("Metric");
     dropdowns[UNITS].option("Imperial");
 
     dropdowns[UNITS].changed(() => {
-       mpaToKsi = dropdowns[UNITS].value() === "Metric" ? 1 : 0.1450377377;
-       unitStr = dropdowns[UNITS].value() === "Metric" ? "MPa" : "ksi";
+       stressC = dropdowns[UNITS].value() === "Metric" ? 6.8947590 : 1;
+       momentC = dropdowns[UNITS].value() === "Metric" ? 8.8507 : 1;
+       lengthC = dropdowns[UNITS].value() === "Metric" ? 25.4 : 1;
+       stressUnit = dropdowns[UNITS].value() === "Metric" ? "MPa" : "ksi";
+       momentUnit = dropdowns[UNITS].value() === "Metric" ? "N-m" : "lb-in";
+       temperatureUnit = dropdowns[UNITS].value() === "Metric" ? "°C" : "°F";
+       lengthUnit = dropdowns[UNITS].value() === "Metric" ? "mm" : "in";
+       textBoxes[TEMP].value((changedTemp ? textBoxes[TEMP].value : (dropdowns[UNITS].value() === "Metric" ? (textBoxes[TEMP].value() - 32) * 5 / 9: textBoxes[TEMP].value() * 9 / 5 + 32)).toFixed(1));
+       d = undefined;
+       prevd = undefined;
     });
 
-    dropdowns[FILLET].option("sharp");
     dropdowns[FILLET].option("well rounded");
+    dropdowns[FILLET].option("sharp");
+    rd = 0.1;
 
     dropdowns[FILLET].changed(() => {
-       done = false;
+        rd = dropdowns[FILLET].value() === "sharp" ? 0.02 : 0.1;
+        d = undefined;
+        prevd = undefined;
     });
 
     dropdowns[UNITS].position(width - 120, 40);
     dropdowns[MATERIAL].position(50, 40);
-    dropdowns[FILLET].position(0.5 * (width - (L + l)) + L + r, 0.5 * (height - D) - 100 + 0.5 * (d - D) + r + D - 10);
+    dropdowns[FILLET].position(0.4 * (width - (L + l)) + L + sr, 0.5 * (height - sD) - 100 + 0.5 * (sd - sD) + sr + sD - 10);
 }
 
 function createTextBoxes(){
     for(const keys in textBoxesTypes)
         textBoxes.push(createInput().size(50, 16));
 
-    textBoxes[MM].position(105, 0.4 * height);
-    textBoxes[MA].position(320, 0.4 * height);
-    textBoxes[TM].position(105, 0.4 * height + 40);
-    textBoxes[TA].position(320, 0.4 * height + 40);
-    textBoxes[TEMP].position(500, 500);
-}
+    textBoxes[MM].input(() => {
+        d = undefined;
+        prevd = undefined;
+    });
 
-function runTextBoxes(){
-    Mm = textBoxes[MM].value() * mpaToKsi;
-    Ma = textBoxes[MA].value() * mpaToKsi;
-    T = textBoxes[TEMP].value();
+    textBoxes[MA].input(() => {
+        d = undefined;
+        prevd = undefined;
+    });
 
-    T = dropdowns[UNITS].value() === "Metric" ? T * 9 / 5 + 32 : T;
+    textBoxes[TM].input(() => {
+        d = undefined;
+        prevd = undefined;
+    });
+
+    textBoxes[TA].input(() => {
+        d = undefined;
+        prevd = undefined;
+    });
+
+    textBoxes[TEMP].value(21.1);
+    textBoxes[TEMP].input(() => {
+       changedTemp = true;
+       d = undefined;
+       prevd = undefined;
+    });
+
+    textBoxes[RE].value(99.99);
+    textBoxes[RE].input(() => {
+       d = undefined;
+       prevd = undefined;
+    });
+
+    textBoxes[FOS].value(1.5);
+    textBoxes[FOS].input(() => {
+        d = undefined;
+        prevd = undefined;
+    });
+
+    textBoxes[MM].position(0.32 * width, 0.72 * height);
+    textBoxes[MA].position(0.32 * width + 230, 0.72 * height);
+    textBoxes[TM].position(0.32 * width, 0.72 * height + 60);
+    textBoxes[TA].position(0.32 * width + 230, 0.72 * height + 60);
+    textBoxes[TEMP].position(width - 120, 85);
+    textBoxes[RE].position(width - 120, 130);
+    textBoxes[FOS].position(100, 80)
 }
 
 function removeDropdowns(){
@@ -249,4 +381,20 @@ function removeTextBoxes(){
         textBoxes[i].remove();
 
     textBoxes = [];
+}
+
+function drawArrowHead(x, y, theta){
+    push();
+    translate(x, y);
+    rotate(theta);
+
+    beginShape();
+    noFill();
+
+    vertex(-8, -5);
+    vertex(0, 0);
+    vertex(-8, 5);
+
+    endShape();
+    pop();
 }
