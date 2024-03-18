@@ -274,10 +274,10 @@ function sketchShaft(){
 
         textAlign(LEFT);
 
-        text("Iterations: ", L + l + 100, 100);
+        text("Iterations: ", L + l + 80, 100);
 
         for (let i = 0; i < iterationHistory.length; i++)
-            text(iterationHistory[i], L + l + 100, 125 + i * 25);
+            text(iterationHistory[i], L + l + 80, 125 + i * 25);
     }
 
     pop();
