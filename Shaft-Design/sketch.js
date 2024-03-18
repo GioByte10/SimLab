@@ -1,3 +1,5 @@
+//This code is part of the Design Project for MAE 190
+
 const FPS = 60;
 let dropdowns = [];
 let textBoxes = [];
@@ -103,6 +105,7 @@ function windowResized(){
     createTextBoxes();
 }
 
+// display all the text we see on the screen and update as needed
 function staticSetup(){
     push();
 
@@ -147,11 +150,12 @@ function setup(){
     windowResized();
 }
 
+// continuous running loop
 function draw(){
     background(220);
     staticSetup();
 
-    if(d === undefined || prevd === undefined || (d - prevd) / prevd > 0.001)
+    if(d === undefined || prevd === undefined || abs((d - prevd) / prevd) > 0.001)
         calculate();
 
     sketchShaft();
@@ -199,9 +203,9 @@ function calculate(){
     nf = textBoxes[FOS].value();
     d = de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs);
     if(d !== 0)
-        iterationHistory[it] = (it + 1) + ". d = " + (d * lengthC).toFixed(2) + ' ' + lengthUnit +
-        "  D = " + (Dd * d * lengthC).toFixed(2) + ' ' + lengthUnit +
-        "  r = " + (rd * d * lengthC).toFixed(2) + ' ' + lengthUnit;
+        iterationHistory[it] = (it + 1) + ". d = " + (d * lengthC).toFixed(3) + ' ' + lengthUnit +
+        "  D = " + (Dd * d * lengthC).toFixed(3) + ' ' + lengthUnit +
+        "  r = " + (rd * d * lengthC).toFixed(3) + ' ' + lengthUnit;
 
     let von_a = sqrt(sq((32 * Kf * Ma) / (PI * d ** 3)) + 3 * sq((16 * Kfs * Ta) / (PI * d ** 3)));
     let von_m = sqrt(sq((32 * Kf * Mm) / (PI * d ** 3)) + 3 * sq((16 * Kfs * Tm) / (PI * d ** 3)));
@@ -215,6 +219,8 @@ function de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs){
         (1 / (Sut * 1000)) * sqrt(4 * (Kf * Mm) ** 2 + 3 * (Kfs * Tm) ** 2)), 1 / 3);
 }
 
+
+// draw the shaft
 function sketchShaft(){
 
     push();
@@ -270,7 +276,6 @@ function sketchShaft(){
         text((d * lengthC).toFixed(2) + ' ' + lengthUnit, L + l / 2, sD / 2);
         text((d * Dd * lengthC).toFixed(2) + ' ' + lengthUnit, L / 2, sD / 2);
         text((d * rd * lengthC).toFixed(2) + ' ' + lengthUnit, L + sr + 30, 0);
-        console.log(d);
 
         textAlign(LEFT);
 
@@ -451,24 +456,23 @@ function drawArrowHead(x, y, theta){
     pop();
 }
 
-
+// cubic spline interpolation
 function spline(xValues, yValues, x) {
     let n = xValues.length;
     if (n !== yValues.length) {
         throw new Error('xValues and yValues must have the same length');
     }
 
-    // Construct coefficients
     let h = [];
     let alpha = [];
-    for (let i = 0; i < n - 1; i++) { // Start from index 0
-        h.push(xValues[i + 1] - xValues[i]); // Adjust indices
+    for (let i = 0; i < n - 1; i++) {
+        h.push(xValues[i + 1] - xValues[i]);
         alpha.push((3 / h[i]) * (yValues[i + 1] - yValues[i]) - (3 / h[i - 1]) * (yValues[i] - yValues[i - 1])); // Adjust indices
     }
 
-    let l = [1]; // l[0] is fixed to 1
-    let mu = [0]; // mu[0] is fixed to 0
-    let z = [0]; // z[0] is fixed to 0
+    let l = [1];
+    let mu = [0];
+    let z = [0];
 
     for (let i = 1; i < n - 1; i++) {
         l.push(2 * (xValues[i + 1] - xValues[i - 1]) - h[i - 1] * mu[i - 1]);
@@ -476,9 +480,8 @@ function spline(xValues, yValues, x) {
         z.push((alpha[i] - h[i - 1] * z[i - 1]) / l[i]);
     }
 
-    // Construct remaining coefficients
-    l.push(1); // l[n-1] is fixed to 1
-    z.push(0); // z[n-1] is fixed to 0
+    l.push(1);
+    z.push(0);
     let c = [];
     let b = [];
     let d = [];
@@ -489,13 +492,11 @@ function spline(xValues, yValues, x) {
         d[j] = (c[j + 1] - c[j]) / (3 * h[j]);
     }
 
-    // Find the interval for x
     let i = 0;
     while (x > xValues[i + 1] && i < n - 1) {
         i++;
     }
 
-    // Compute interpolated value
     let dx = x - xValues[i];
     return yValues[i] + b[i] * dx + c[i] * dx ** 2 + d[i] * dx ** 3;
 }
