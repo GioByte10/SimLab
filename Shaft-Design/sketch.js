@@ -221,7 +221,7 @@ function sketchShaft(){
 
     noFill();
     stroke(0);
-    translate(0.4 * (width - (L + l)), 0.5 * (height - sD) - 100);
+    translate(0.4 * (width - (L + l)), 0.42 * (height - sD));
 
     fill("#c6eafa");
     beginShape();
@@ -274,10 +274,10 @@ function sketchShaft(){
 
         textAlign(LEFT);
 
-        text("Iterations: ", L + l + 120, 100);
+        text("Iterations: ", L + l + 100, 100);
 
         for (let i = 0; i < iterationHistory.length; i++)
-            text(iterationHistory[i], L + l + 120, 125 + i * 25);
+            text(iterationHistory[i], L + l + 100, 125 + i * 25);
     }
 
     pop();
@@ -330,7 +330,7 @@ function createDropdowns(){
 
     dropdowns[UNITS].position(width - 120, 40);
     dropdowns[MATERIAL].position(50, 40);
-    dropdowns[FILLET].position(0.4 * (width - (L + l)) + L + sr, 0.5 * (height - sD) - 100 + 0.5 * (sd - sD) + sr + sD - 10);
+    dropdowns[FILLET].position(0.4 * (width - (L + l)) + L + sr, 0.42 * (height - sD) + 0.5 * (sd - sD) + sr + sD - 10);
 }
 
 function createTextBoxes(){
@@ -411,14 +411,14 @@ function createTextBoxes(){
         bts = spline(DdValues_ts, bValues_ts, Dd);
     });
 
-    textBoxes[MM].position(0.32 * width, 0.72 * height);
-    textBoxes[MA].position(0.32 * width + 230, 0.72 * height);
-    textBoxes[TM].position(0.32 * width, 0.72 * height + 60);
-    textBoxes[TA].position(0.32 * width + 230, 0.72 * height + 60);
+    textBoxes[MM].position(0.32 * width, 0.75 * height);
+    textBoxes[MA].position(0.32 * width + 230, 0.75 * height);
+    textBoxes[TM].position(0.32 * width, 0.75 * height + 60);
+    textBoxes[TA].position(0.32 * width + 230, 0.75 * height + 60);
     textBoxes[TEMP].position(width - 120, 85);
     textBoxes[RE].position(width - 120, 130);
     textBoxes[FOS].position(90, 80);
-    textBoxes[DD].position(0.4 * (width - (L + l)) - 100, 0.5 * (height - sD) - 100)
+    textBoxes[DD].position(0.4 * (width - (L + l)) - 100, 0.42 * (height - sD) + sD / 2)
 }
 
 function removeDropdowns(){
