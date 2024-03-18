@@ -15,6 +15,11 @@ let prevd;
 let nf = 1.5;
 let ny;
 
+let at;
+let bt;
+let ats;
+let bts;
+
 let sD = 300;
 let sd = 180;
 let sr = 40;
@@ -45,9 +50,10 @@ const textBoxesTypes ={
     TA: 3,
     TEMP: 4,
     RE: 5,
-    FOS: 6
+    FOS: 6,
+    DD: 7,
 };
-const {MM, MA, TM, TA, TEMP, RE, FOS} = textBoxesTypes;
+const {MM, MA, TM, TA, TEMP, RE, FOS, DD} = textBoxesTypes;
 
 const strengthType = {
     SUT: 1,
@@ -105,25 +111,28 @@ function staticSetup(){
     text("Sut = " + round(Sut * stressC) + ' ' + stressUnit, dropdowns[MATERIAL].x + 170, dropdowns[MATERIAL].y + 13);
     text("Sy = " + round(Sy * stressC) + ' ' + stressUnit, dropdowns[MATERIAL].x + 170 + 150, dropdowns[MATERIAL].y + 13);
 
-    text("Mₘ = ", textBoxes[MM].position().x - 53, textBoxes[MM].position().y + 12);
+    text("Mₘ = ", textBoxes[MM].position().x - 50, textBoxes[MM].position().y + 12);
     text(momentUnit, textBoxes[MM].position().x + 70, textBoxes[MM].position().y + 12);
 
-    text("Mₐ = ", textBoxes[MA].position().x - 53, textBoxes[MA].position().y + 12);
+    text("Mₐ = ", textBoxes[MA].position().x - 50, textBoxes[MA].position().y + 12);
     text(momentUnit, textBoxes[MA].position().x + 70, textBoxes[MA].position().y + 12);
 
-    text("Tₐ = ", textBoxes[TA].position().x - 53, textBoxes[TA].position().y + 12);
+    text("Tₐ = ", textBoxes[TA].position().x - 50, textBoxes[TA].position().y + 12);
     text(momentUnit, textBoxes[TA].position().x + 70, textBoxes[TA].position().y + 12);
 
-    text("Tₘ = ", textBoxes[TM].position().x - 53, textBoxes[TM].position().y + 12);
+    text("Tₘ = ", textBoxes[TM].position().x - 50, textBoxes[TM].position().y + 12);
     text(momentUnit, textBoxes[TM].position().x + 70, textBoxes[TM].position().y + 12);
 
     text(temperatureUnit, textBoxes[TEMP].position().x + 70, textBoxes[TEMP].position().y + 12);
 
     text("%", textBoxes[RE].position().x + 70, textBoxes[RE].position().y + 12);
 
-    text("nf = ", textBoxes[FOS].position().x - 50, textBoxes[FOS].position().y + 12);
+    text("nf = ", textBoxes[FOS].position().x - 40, textBoxes[FOS].position().y + 12);
+
     if (!isNaN(ny))
-        text("ny = " + ny.toFixed(2), textBoxes[FOS].position().x - 50, textBoxes[FOS].position().y + 50);
+        text("ny = " + ny.toFixed(2), textBoxes[FOS].position().x - 40, textBoxes[FOS].position().y + 50);
+
+    text("D/d = " , textBoxes[DD].position().x - 60, textBoxes[DD].position().y + 12)
 
     pop();
 }
@@ -142,17 +151,23 @@ function draw(){
     background(220);
     staticSetup();
 
-    sketchShaft();
     if(d === undefined || prevd === undefined || (d - prevd) / prevd > 0.001)
         calculate();
+
+    sketchShaft();
 }
 
 function calculate(){
 
+    if(d === undefined)
+        iterationHistory = [];
+
     it = d === undefined ? 0 : it + 1;
     prevd = d === undefined ? undefined : d;
-    let Kt = d === undefined ? (rd === 0.02 ?  2.7 : 1.7) : (0.97098 * rd ** -0.21796);
-    let Kts = d === undefined ? (rd === 0.02 ? 2.2 : 1.5) : (0.83425 * rd ** -0.21649);
+
+    let Kt = d === undefined ? (rd === 0.02 ?  2.7 : 1.7) : (at * rd ** bt);
+    let Kts = d === undefined ? (rd === 0.02 ? 2.2 : 1.5) : (ats * rd ** bts);
+
     let T = dropdowns[UNITS].value() === "Metric" ? textBoxes[TEMP].value() * 9 / 5 + 32 : textBoxes[TEMP].value();
 
     let ka = (dropdowns[MATERIAL].value().includes("CD") ? 2.7 : 14.4) * Sut ** (dropdowns[MATERIAL].value().includes("CD") ? -0.265 : -0.718);
@@ -165,8 +180,6 @@ function calculate(){
     let kd = 0.975 + (0.432 * T * 10 ** -3) - (0.115 * T ** 2 * 10 ** -5) + (0.104 * T ** 3 * 10 ** -8) - (0.595 * T ** 4 * 10 ** -12);
     let ke = 1 - 0.08 * jStat.normal.inv(textBoxes[RE].value() / 100, 0, 1);
     let kf = 1;
-
-    //console.log(70);
 
     let Sep = Sut <= 200 ? 0.5 * Sut : 100;
     let Se = ka * kb * kc * kd * ke * kf * Sep;
@@ -183,6 +196,7 @@ function calculate(){
     let Tm = textBoxes[TM].value() * momentC;
     let Ta = textBoxes[TA].value() * momentC;
 
+    nf = textBoxes[FOS].value();
     d = de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs);
     if(d !== 0)
         iterationHistory[it] = (it + 1) + ". d = " + (d * lengthC).toFixed(2) + ' ' + lengthUnit +
@@ -221,20 +235,6 @@ function sketchShaft(){
     vertex(0, sD);
     endShape(CLOSE);
 
-    stroke(0);
-    strokeWeight(1);
-    line(L / 2, sD / 2 - 35, L / 2, 0);
-    drawArrowHead(L / 2, 0, -90);
-
-    line(L / 2, sD / 2 + 35, L / 2, sD);
-    drawArrowHead(L / 2, sD, 90);
-
-    line(L + l / 2, sD / 2 - 35, L + l / 2, (sD - sd) / 2);
-    drawArrowHead(L + l / 2, (sD - sd) / 2, -90);
-
-    line(L + l / 2, sD / 2 + 35, L  + l / 2, sD - (sD - sd) / 2);
-    drawArrowHead(L + l / 2, sD - (sD - sd) / 2, 90);
-
     noStroke();
     rect(L - 1, 0.5 * (sD - sd) - sr + 1, sr, sr);
     rect(L - 1, 0.5 * (sd - sD) + sD - 1, sr, sr);
@@ -245,24 +245,40 @@ function sketchShaft(){
     arc(L + sr, 0.5 * (sD - sd) - sr, 2 * sr, 2 * sr, 89, 181);
     arc(L + sr, 0.5 * (sd - sD) + sr + sD, 2 * sr, 2 * sr, 179, 271);
 
-    line(L + sr, 0.5 * (sD - sd) - sr, L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr);
-    drawArrowHead(L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr, 135)
+    if(iterationHistory.length > 0) {
+        stroke(0);
+        strokeWeight(1);
+        line(L / 2, sD / 2 - 35, L / 2, 0);
+        drawArrowHead(L / 2, 0, -90);
 
-    noStroke();
-    fill(0);
-    textSize(18);
-    textAlign(CENTER, CENTER);
-    text((d * lengthC).toFixed(2) + ' ' + lengthUnit, L + l/ 2, sD / 2);
-    text((d * Dd * lengthC).toFixed(2) + ' ' + lengthUnit, L / 2, sD / 2);
-    text((d * rd * lengthC).toFixed(2) + ' ' + lengthUnit, L + sr + 30,0)
+        line(L / 2, sD / 2 + 35, L / 2, sD);
+        drawArrowHead(L / 2, sD, 90);
 
-    textAlign(LEFT);
+        line(L + l / 2, sD / 2 - 35, L + l / 2, (sD - sd) / 2);
+        drawArrowHead(L + l / 2, (sD - sd) / 2, -90);
 
-    if(iterationHistory.length > 0)
+        line(L + l / 2, sD / 2 + 35, L + l / 2, sD - (sD - sd) / 2);
+        drawArrowHead(L + l / 2, sD - (sD - sd) / 2, 90);
+
+        line(L + sr, 0.5 * (sD - sd) - sr, L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr);
+        drawArrowHead(L + sr + cos(135) * sr, 0.5 * (sD - sd) - sr + sin(135) * sr, 135)
+
+        noStroke();
+        fill(0);
+        textSize(18);
+        textAlign(CENTER, CENTER);
+        text((d * lengthC).toFixed(2) + ' ' + lengthUnit, L + l / 2, sD / 2);
+        text((d * Dd * lengthC).toFixed(2) + ' ' + lengthUnit, L / 2, sD / 2);
+        text((d * rd * lengthC).toFixed(2) + ' ' + lengthUnit, L + sr + 30, 0);
+        console.log(d);
+
+        textAlign(LEFT);
+
         text("Iterations: ", L + l + 120, 100);
 
-    for(let i = 0; i < iterationHistory.length; i++)
-        text(iterationHistory[i], L + l + 120, 125 + i * 25);
+        for (let i = 0; i < iterationHistory.length; i++)
+            text(iterationHistory[i], L + l + 120, 125 + i * 25);
+    }
 
     pop();
 }
@@ -360,13 +376,49 @@ function createTextBoxes(){
         prevd = undefined;
     });
 
+    let DdValues_t = [1.01, 1.02, 1.03, 1.05, 1.07, 1.10, 1.20, 1.50, 2, 3, 6];
+    let aValues_t = [0.91938, 0.96048, 0.98061, 0.98137, 0.97527, 0.95120, 0.97098, 0.93836, 0.90879, 0.89334, 0.87868];
+    let bValues_t = [-0.17032, -0.17711, -0.18381, -0.19653, -0.20958, -0.23757, -0.21796, -0.25759, -0.28598, -0.30860, -0.33243];
+
+    let DdValues_ts = [1.09, 1.2, 1.33, 2];
+    let aValues_ts = [0.90337, 0.83425, 0.84897, 0.86331];
+    let bValues_ts = [-0.12692, -0.21649, -0.23161, -0.23865];
+
+    at = spline(DdValues_t, aValues_t, Dd);
+    bt = spline(DdValues_t, bValues_t, Dd);
+
+    ats = spline(DdValues_ts, aValues_ts, Dd);
+    bts = spline(DdValues_ts, bValues_ts, Dd);
+
+    textBoxes[DD].value(1.2);
+    textBoxes[DD].input(() => {
+        Dd = textBoxes[DD].value();
+        d = undefined;
+        prevd = undefined;
+
+        let DdValues_t = [1.01, 1.02, 1.03, 1.05, 1.07, 1.10, 1.20, 1.50, 2, 3, 6];
+        let aValues_t = [0.91938, 0.96048, 0.98061, 0.98137, 0.97527, 0.95120, 0.97098, 0.93836, 0.90879, 0.89334, 0.87868];
+        let bValues_t = [-0.17032, -0.17711, -0.18381, -0.19653, -0.20958, -0.23757, -0.21796, -0.25759, -0.28598, -0.30860, -0.33243];
+
+        let DdValues_ts = [1.09, 1.2, 1.33, 2];
+        let aValues_ts = [0.90337, 0.83425, 0.84897, 0.86331];
+        let bValues_ts = [-0.12692, -0.21649, -0.23161, -0.23865];
+
+        at = spline(DdValues_t, aValues_t, Dd);
+        bt = spline(DdValues_t, bValues_t, Dd);
+
+        ats = spline(DdValues_ts, aValues_ts, Dd);
+        bts = spline(DdValues_ts, bValues_ts, Dd);
+    });
+
     textBoxes[MM].position(0.32 * width, 0.72 * height);
     textBoxes[MA].position(0.32 * width + 230, 0.72 * height);
     textBoxes[TM].position(0.32 * width, 0.72 * height + 60);
     textBoxes[TA].position(0.32 * width + 230, 0.72 * height + 60);
     textBoxes[TEMP].position(width - 120, 85);
     textBoxes[RE].position(width - 120, 130);
-    textBoxes[FOS].position(100, 80)
+    textBoxes[FOS].position(90, 80);
+    textBoxes[DD].position(0.4 * (width - (L + l)) - 100, 0.5 * (height - sD) - 100)
 }
 
 function removeDropdowns(){
@@ -397,4 +449,53 @@ function drawArrowHead(x, y, theta){
 
     endShape();
     pop();
+}
+
+
+function spline(xValues, yValues, x) {
+    let n = xValues.length;
+    if (n !== yValues.length) {
+        throw new Error('xValues and yValues must have the same length');
+    }
+
+    // Construct coefficients
+    let h = [];
+    let alpha = [];
+    for (let i = 0; i < n - 1; i++) { // Start from index 0
+        h.push(xValues[i + 1] - xValues[i]); // Adjust indices
+        alpha.push((3 / h[i]) * (yValues[i + 1] - yValues[i]) - (3 / h[i - 1]) * (yValues[i] - yValues[i - 1])); // Adjust indices
+    }
+
+    let l = [1]; // l[0] is fixed to 1
+    let mu = [0]; // mu[0] is fixed to 0
+    let z = [0]; // z[0] is fixed to 0
+
+    for (let i = 1; i < n - 1; i++) {
+        l.push(2 * (xValues[i + 1] - xValues[i - 1]) - h[i - 1] * mu[i - 1]);
+        mu.push(h[i] / l[i]);
+        z.push((alpha[i] - h[i - 1] * z[i - 1]) / l[i]);
+    }
+
+    // Construct remaining coefficients
+    l.push(1); // l[n-1] is fixed to 1
+    z.push(0); // z[n-1] is fixed to 0
+    let c = [];
+    let b = [];
+    let d = [];
+    c[n - 1] = 0;
+    for (let j = n - 2; j >= 0; j--) {
+        c[j] = z[j] - mu[j] * c[j + 1];
+        b[j] = (yValues[j + 1] - yValues[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3;
+        d[j] = (c[j + 1] - c[j]) / (3 * h[j]);
+    }
+
+    // Find the interval for x
+    let i = 0;
+    while (x > xValues[i + 1] && i < n - 1) {
+        i++;
+    }
+
+    // Compute interpolated value
+    let dx = x - xValues[i];
+    return yValues[i] + b[i] * dx + c[i] * dx ** 2 + d[i] * dx ** 3;
 }
