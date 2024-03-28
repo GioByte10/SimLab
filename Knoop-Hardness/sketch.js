@@ -174,7 +174,7 @@ function staticSetup(){
 
     textSize(30);
     if(done)
-        text(str((206.9 + variation).toFixed(1)) + '  HK0.5', windowWidth * 9 / 10, windowHeight * 3 / 10);
+        text(str((599 + variation).toFixed(1)) + '  HK0.3', windowWidth * 9 / 10, windowHeight * 3 / 10);
     pop();
 
 }
