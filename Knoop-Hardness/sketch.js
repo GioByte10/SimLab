@@ -11,7 +11,7 @@ let lensKnob;
 let inputButton;
 let done = false;
 
-let filarBounds = [-395, -214, 231, 430];
+let filarBounds = [-520, -350, 436, 600];
 
 let bgHeight;
 let bgWidth;
@@ -37,8 +37,8 @@ data["time"].setHours(data["time"].getHours() - 8);
 
 
 function preload(){
-    bg = loadImage('images/background_.jpg');
-    sample = loadImage('images/sample_r_.png');
+    bg = loadImage('images/background_knoop.jpg');
+    sample = loadImage('images/sample_r_knoop.png');
 }
 
 function windowResized(){
@@ -131,6 +131,9 @@ function draw(){
     logs();
     prevMouse = mouseIsPressed;
     displayArrows();
+
+    // console.log(baseKnob.theta);
+    // console.log(measuringKnob.theta + baseKnob.theta - baseKnob.theta0);
 }
 function displayArrows(){
     displayArrow(baseKnob, createVector(matchHeight ? 0.4 * bgWidth - (bgWidth - windowWidth) / 2 : 0.4 * bgWidth, baseKnob.y), color(0));
@@ -178,6 +181,7 @@ function staticSetup(){
     pop();
 
 }
+
 function blur(){
     push();
     drawingContext.filter = 'blur(' + str(abs(focusKnob.theta - focus)) / 50 + 'px)';
@@ -185,6 +189,7 @@ function blur(){
     image(sample, -lensRadius, -lensRadius, 2 * lensRadius, 2 * lensRadius);
     pop();
 }
+
 function drawFilars(){
 
     push();
@@ -232,6 +237,7 @@ function logs(){
         text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 50, 120);
     }
 }
+
 function keyPressed(){
     if(keyCode === LEFT_ARROW){
         videoBack = true;
@@ -245,6 +251,7 @@ function keyPressed(){
         text((measuringKnob.theta + baseKnob.theta - baseKnob.theta0).toFixed(2), 100, 100);
     }
 }
+
 class Knob{
     constructor(x, y, r, lowerTheta, upperTheta, theta0, sides, callbackShape = noCallback, strokeWeight = -1, stroke = -1, fill = -1){
         this.x = x;
@@ -324,6 +331,7 @@ class Knob{
         }
     }
 }
+
 class Button {
     constructor(x, y, w, h, callback) {
         this.x = x;
@@ -384,6 +392,7 @@ class Button {
         this.callback = callback;
     }
 }
+
 function lensKnobShape(){
     push();
     stroke(100);
@@ -401,6 +410,7 @@ function lensKnobShape(){
     circle(0, 0, lensKnob.r * 2 - 9);
     pop();
 }
+
 function focusKnobShape(){
     push();
     translate(focusKnob.x, focusKnob.y);
@@ -415,6 +425,7 @@ function focusKnobShape(){
 
     pop();
 }
+
 function measuringKnobShape(){
     push();
     translate(measuringKnob.x, measuringKnob.y);
@@ -444,6 +455,7 @@ function measuringKnobShape(){
 
     pop();
 }
+
 function baseKnobShape(){
     push();
     translate(baseKnob.x, baseKnob.y);
@@ -473,6 +485,7 @@ function baseKnobShape(){
 
     pop();
 }
+
 function downloadObjectAsJson(exportObj, exportName){
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
     let downloadAnchorNode = document.createElement('a');
@@ -482,6 +495,7 @@ function downloadObjectAsJson(exportObj, exportName){
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
+
 function mouseWheel(event) {
     for(let i = 0; i < knobs.length; i++)
         if((dist(mouseX, mouseY, knobs[i].x, knobs[i].y) < knobs[i].r)) {
@@ -490,14 +504,17 @@ function mouseWheel(event) {
             k++;
         }
 }
+
 function mousePressed(){
     data[k] = [performance.now(), "mousePressed"];
     k++;
 }
+
 function mouseMoved(){
     data[k] = [performance.now(), "mouseMoved"];
     k++;
 }
+
 function resetInteractive(){
 
     done = false;
