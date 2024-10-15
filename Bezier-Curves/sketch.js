@@ -3,7 +3,9 @@ const duration = 10;
 let points = new Float32Array(0);
 let timeStamp = -(duration * 1000 + 1);
 let t;
-let dark = false;
+let pausedT;
+let dark = true;
+let paused = false;
 
 let checkRandomColor;
 let checkBackgroundColor;
@@ -38,26 +40,32 @@ function staticSetup(){
 
     textSize(16);
     textAlign(LEFT);
-    text("Bézier Curve Simulation", 15, 25);
+    text("Bézier Curve Simulation", 15, 30);
+    text("Click on the screen to place points", 15, 52)
+    text("Press SPACE to start simulation", 15, 74);
+    text("Press P to pause simulation", 15, 96);
 
     textSize(16);
     textAlign(RIGHT);
 
     if(t < duration)
-        text(t.toPrecision(3), windowWidth - 15, 20);
+        text(t.toPrecision(3), windowWidth - 20, windowHeight - 20);
 
-    text(points.length / 2, windowWidth - 15, 50)
+    text(points.length / 2, windowWidth - 20, 30)
     pop();
 
 }
 
 function draw(){
+    if(paused)
+        return;
+
     background(0, 0,dark ? 0 : 86);
     staticSetup();
 
     t = (millis() - timeStamp) / 1000;
 
-    strokeWeight(2);
+    strokeWeight(3);
     if(points.length > 1)
         displayPoints()
 
@@ -69,11 +77,10 @@ function draw(){
 }
 
 function displayCurve(){
-    for(let i = 0; i < curvePoints.length - 1; i++){
-        strokeWeight(2);
-        stroke(2);
-        line(curvePoints[i][x], curvePoints[i][y], curvePoints[i + 1][x], curvePoints[i + 1][y]);
-
+    for(let i = 0; i < (curvePoints.length) / 2 - 1; i++){
+        strokeWeight(4);
+        stroke(0, 100, 80);
+        line(curvePoints[2 * i + x], curvePoints[2 * i + y], curvePoints[2 * i + 2 + x], curvePoints[2 * i + 2 + y]);
     }
 }
 
@@ -110,10 +117,11 @@ function displayLines(){
     }
 
     push();
-    stroke(255, 0, 0);
+    stroke(0, 100, 80);
     strokeWeight(10);
     point(localPoints[x], localPoints[y]);
-    curvePoints.push([localPoints[x], localPoints[y]]);
+    curvePoints.push(localPoints[x]);
+    curvePoints.push(localPoints[y]);
     pop();
 
     pop();
@@ -121,11 +129,6 @@ function displayLines(){
 
 function displayPoints(){
     push();
-
-    // noFill();
-    // stroke(dark ? 255 : 0);
-    // bezier(...points);
-
     stroke(dark ? 255 : 0)
     for(let i = 0; i < (points.length) / 2 - 1; i++)
         line(points[2 * i + x], points[2 * i + y], points[2 * i + 2 + x], points[2 * i + 2 + y]);
@@ -134,7 +137,7 @@ function displayPoints(){
 
 function createChecks(){
     checkRandomColor = createCheckbox('Random colors', true);
-    checkRandomColor.position(12, 35);
+    checkRandomColor.position(12, 104);
     checkRandomColor.style('font-family', 'Helvetica, serif');
     checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
     checkRandomColor.style('-webkit-user-select', 'none');
@@ -142,7 +145,7 @@ function createChecks(){
     checkRandomColor.style('user-select', 'none');
 
     checkBackgroundColor = createCheckbox('Dark background', dark);
-    checkBackgroundColor.position(12, 55);
+    checkBackgroundColor.position(12, 126);
     checkBackgroundColor.style('font-family', 'Helvetica, serif');
     checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
     checkBackgroundColor.style('-webkit-user-select', 'none');
@@ -158,15 +161,30 @@ function createChecks(){
 
 function keyPressed(){
     if(keyCode === 32) {            //SPACE_KEY
-        timeStamp = millis();
-        rr = random(360);
-        rg = random(50);
-        rb = random(30);
-        curvePoints = []
+        if(!paused) {
+            timeStamp = millis();
+            rr = random(360);
+            rg = random(50);
+            rb = random(30);
+            curvePoints = []
+        }else {
+            paused = false;
+            timeStamp = millis() - pausedT * 1000
+        }
     }
 
     else if(keyCode === 67)         // C key
         clearScreen()
+
+    else if(keyCode === 80) {        // P Key
+        paused = !paused;
+
+        if(paused)
+            pausedT = t;
+
+        else
+            timeStamp = millis() - pausedT * 1000
+    }
 }
 
 function clearScreen(){
@@ -176,7 +194,7 @@ function clearScreen(){
 }
 
 function touchStarted(){
-    if(mouseX > 100 && mouseY > 50) {
+    if(!(mouseX < 250 && mouseY < 200)) {
         let newPoints = new Float32Array(points.length + 2);
         newPoints.set(points);
         newPoints.set([mouseX, mouseY], points.length);
