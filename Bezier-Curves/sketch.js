@@ -1,23 +1,44 @@
 const FPS = 60;
 const duration = 10;
-let points = [];
+let points = new Float32Array(0);
 let timeStamp = -(duration * 1000 + 1);
 let t;
+let dark = false;
+
+let checkRandomColor;
+let checkBackgroundColor;
+
+let curvePoints = [];
+
+let rr;
+let rg;
+let rb;
+
+const x = 0;
+const y = 1;
+
+p5.disableFriendlyErrors = true;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     frameRate(FPS);
+    colorMode(HSB, 360, 100, 100);
 
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
+
+    createChecks();
+
 }
 
 function staticSetup(){
+    push();
 
-    textSize(14);
+    dark ? (noStroke(), fill(255)) : (noStroke(), fill(0))
+
+    textSize(16);
     textAlign(LEFT);
-    for(let i = 0; i < points.length; i++)
-        text("[" + points[i] + "]", 15,20 * (i + 1));
+    text("Bézier Curve Simulation", 15, 25);
 
     textSize(16);
     textAlign(RIGHT);
@@ -25,52 +46,149 @@ function staticSetup(){
     if(t < duration)
         text(t.toPrecision(3), windowWidth - 15, 20);
 
+    text(points.length / 2, windowWidth - 15, 50)
+    pop();
+
 }
 
 function draw(){
-    background(220);
+    background(0, 0,dark ? 0 : 86);
     staticSetup();
 
     t = (millis() - timeStamp) / 1000;
 
-    displayCurve(points);
-}
+    strokeWeight(2);
+    if(points.length > 1)
+        displayPoints()
 
-function displayCurve(nestedPoints){
-    if(nestedPoints.length < 2)
-        return;
-
-    let points = [];
-    for(let i = 0; i < nestedPoints.length - 1; i++){
-        line(nestedPoints[i][0], nestedPoints[i][1], nestedPoints[i + 1][0], nestedPoints[i + 1][1]);
-
-        points.push([nestedPoints[i][0] + t * (nestedPoints[i + 1][0] - nestedPoints[i][0]) / duration, nestedPoints[i][1] + t * (nestedPoints[i + 1][1] - nestedPoints[i][1]) / duration]);
-        console.log(points);
+    if (t < duration && points.length > 2) {
+        displayLines();
     }
-    if(t < duration)
-        displayCurve(points);
+
+    displayCurve();
 }
 
-//
-// class bline{
-//     constructor() {
-//         this.
-//     }
-// }
+function displayCurve(){
+    for(let i = 0; i < curvePoints.length - 1; i++){
+        strokeWeight(2);
+        stroke(2);
+        line(curvePoints[i][x], curvePoints[i][y], curvePoints[i + 1][x], curvePoints[i + 1][y]);
+
+    }
+}
+
+function displayLines(){
+
+    let localPoints = new Float32Array(points);
+
+    for(let j = 0; j < (points.length) / 2 - 1; j++) {
+        localPoints[2 * j + x] += t * (localPoints[2 * j + 2 + x] - localPoints[2 * j + x]) / duration;
+        localPoints[2 * j + y] += t * (localPoints[2 * j + 2 + y] - localPoints[2 * j + y]) / duration;
+    }
+
+    push();
+    for(let i = 0; i < (points.length) / 2 - 2; i++){
+        checkRandomColor.checked() ? stroke(((i + 1) * rr) % 360, ((i + 1) * rg) % 50 + 50, ((i + 1) * rb) % 30 + 70) : stroke(dark ? 255 : 0);
+        for(let j = 0; j < (points.length) / 2 - i - 2; j++) {
+
+            line(localPoints[2 * j + x], localPoints[2 * j + y], localPoints[2 * j + 2 + x], localPoints[2 * j + 2 + y]);
+
+            push();
+            stroke(dark ? 255 : 0);
+            strokeWeight(10);
+            point(localPoints[2 * j + x], localPoints[2 * j + y]);
+            pop();
+
+            localPoints[2 * j + x] += t * (localPoints[2 * j + 2 + x] - localPoints[2 * j + x]) / duration;
+            localPoints[2 * j + y] += t * (localPoints[2 * j + 2 + y] - localPoints[2 * j + y]) / duration;
+        }
+        push();
+        stroke(dark ? 255 : 0);
+        strokeWeight(10);
+        point(localPoints[points.length - 2 * i - 4 + x], localPoints[points.length - 2 * i - 4 + y]);
+        pop();
+    }
+
+    push();
+    stroke(255, 0, 0);
+    strokeWeight(10);
+    point(localPoints[x], localPoints[y]);
+    curvePoints.push([localPoints[x], localPoints[y]]);
+    pop();
+
+    pop();
+}
+
+function displayPoints(){
+    push();
+
+    // noFill();
+    // stroke(dark ? 255 : 0);
+    // bezier(...points);
+
+    stroke(dark ? 255 : 0)
+    for(let i = 0; i < (points.length) / 2 - 1; i++)
+        line(points[2 * i + x], points[2 * i + y], points[2 * i + 2 + x], points[2 * i + 2 + y]);
+    pop();
+}
+
+function createChecks(){
+    checkRandomColor = createCheckbox('Random colors', true);
+    checkRandomColor.position(12, 35);
+    checkRandomColor.style('font-family', 'Helvetica, serif');
+    checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
+    checkRandomColor.style('-webkit-user-select', 'none');
+    checkRandomColor.style('-ms-user-select', 'none');
+    checkRandomColor.style('user-select', 'none');
+
+    checkBackgroundColor = createCheckbox('Dark background', dark);
+    checkBackgroundColor.position(12, 55);
+    checkBackgroundColor.style('font-family', 'Helvetica, serif');
+    checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
+    checkBackgroundColor.style('-webkit-user-select', 'none');
+    checkBackgroundColor.style('-ms-user-select', 'none');
+    checkBackgroundColor.style('user-select', 'none');
+    checkBackgroundColor.changed(() => {
+        dark = !dark;
+        checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
+        checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
+    });
+
+}
 
 function keyPressed(){
-    if(keyCode === 32)          //SPACE_KEY
+    if(keyCode === 32) {            //SPACE_KEY
         timeStamp = millis();
+        rr = random(360);
+        rg = random(50);
+        rb = random(30);
+        curvePoints = []
+    }
 
-    else if(keyCode === 67)      // C key
+    else if(keyCode === 67)         // C key
         clearScreen()
 }
 
 function clearScreen(){
-    points = []
+    points = new Float32Array(0);
+    curvePoints = [];
     timeStamp = -(duration * 1000 + 1);
 }
 
 function touchStarted(){
-    points.push([mouseX, mouseY]);
+    if(mouseX > 100 && mouseY > 50) {
+        let newPoints = new Float32Array(points.length + 2);
+        newPoints.set(points);
+        newPoints.set([mouseX, mouseY], points.length);
+
+        points = newPoints;
+    }
+}
+
+function textArray(arr, column){
+    textSize(14);
+    textAlign(LEFT);
+
+    for(let i = 0; i < arr.length; i++)
+        text("[" + arr[i] + "]", column * 300 + 15,20 * (i + 1));
 }
