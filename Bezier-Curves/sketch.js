@@ -11,6 +11,8 @@ let checkRandomColor;
 let checkBackgroundColor;
 
 let curvePoints = [];
+let curvePointsSpeed = [];
+let currentCurve = -1;
 
 let rr;
 let rg;
@@ -43,7 +45,8 @@ function staticSetup(){
     text("Bézier Curve Simulation", 15, 30);
     text("Click on the screen to place points", 15, 52)
     text("Press SPACE to start simulation", 15, 74);
-    text("Press P to pause simulation", 15, 96);
+    text("Press C to clear the screen", 15, 96)
+    text("Press P to pause simulation", 15, 118);
 
     textSize(16);
     textAlign(RIGHT);
@@ -69,19 +72,73 @@ function draw(){
     if(points.length > 1)
         displayPoints()
 
-    if (t < duration && points.length > 2) {
-        displayLines();
+    if (points.length > 2) {
+        if(t < duration && currentCurve === 0)
+            displayLines();
+
+        else if(t > duration && currentCurve === 0) {
+            currentCurve++;
+            timeStamp = millis();
+        }
+
+        else if(t < duration && currentCurve === 1)
+            displayLinesSpeed()
     }
 
-    displayCurve();
+    displayCurves();
 }
 
-function displayCurve(){
-    for(let i = 0; i < (curvePoints.length) / 2 - 1; i++){
-        strokeWeight(4);
-        stroke(0, 100, 80);
-        line(curvePoints[2 * i + x], curvePoints[2 * i + y], curvePoints[2 * i + 2 + x], curvePoints[2 * i + 2 + y]);
+function displayLinesSpeed(){
+
+    let localPoints = new Float32Array(points);
+
+    for(let j = 0; j < (points.length) / 2 - 1; j++) {
+        let rx = localPoints[2 * j + 2 + x] - localPoints[2 * j + x];
+        let ry = localPoints[2 * j + 2 + y] - localPoints[2 * j + y];
+
+        let mag = sqrt(sq(rx) + sq(ry));
+
+        localPoints[2 * j + x] += constrain(400 * t * (rx / mag) / duration, -abs(rx), abs(rx));
+        localPoints[2 * j + y] += constrain(400 * t * (ry / mag) / duration, -abs(ry), abs(ry));
     }
+
+    push();
+    for(let i = 0; i < (points.length) / 2 - 2; i++){
+        checkRandomColor.checked() ? stroke(((i + 1) * rr) % 360, ((i + 1) * rg) % 50 + 50, ((i + 1) * rb) % 30 + 70) : stroke(dark ? 255 : 0);
+        for(let j = 0; j < (points.length) / 2 - i - 2; j++) {
+
+            line(localPoints[2 * j + x], localPoints[2 * j + y], localPoints[2 * j + 2 + x], localPoints[2 * j + 2 + y]);
+
+            push();
+            stroke(dark ? 255 : 0);
+            strokeWeight(10);
+            point(localPoints[2 * j + x], localPoints[2 * j + y]);
+            pop();
+
+            let rx = localPoints[2 * j + 2 + x] - localPoints[2 * j + x];
+            let ry = localPoints[2 * j + 2 + y] - localPoints[2 * j + y];
+
+            let mag = sqrt(sq(rx) + sq(ry));
+
+            localPoints[2 * j + x] += constrain(500 * t * (rx / mag) / duration, -abs(rx), abs(rx));
+            localPoints[2 * j + y] += constrain(500 * t * (ry / mag) / duration, -abs(ry), abs(ry));
+        }
+        push();
+        stroke(dark ? 255 : 0);
+        strokeWeight(10);
+        point(localPoints[points.length - 2 * i - 4 + x], localPoints[points.length - 2 * i - 4 + y]);
+        pop();
+    }
+
+    push();
+    stroke(205, 90, 90);
+    strokeWeight(10);
+    point(localPoints[x], localPoints[y]);
+    curvePointsSpeed.push(localPoints[x]);
+    curvePointsSpeed.push(localPoints[y]);
+    pop();
+
+    pop();
 }
 
 function displayLines(){
@@ -127,6 +184,20 @@ function displayLines(){
     pop();
 }
 
+function displayCurves(){
+    for(let i = 0; i < (curvePoints.length) / 2 - 1; i++){
+        strokeWeight(4);
+        stroke(0, 100, 80);
+        line(curvePoints[2 * i + x], curvePoints[2 * i + y], curvePoints[2 * i + 2 + x], curvePoints[2 * i + 2 + y]);
+    }
+
+    for(let i = 0; i < (curvePointsSpeed.length) / 2 - 1; i++){
+        strokeWeight(4);
+        stroke(205, 90, 90);
+        line(curvePointsSpeed[2 * i + x], curvePointsSpeed[2 * i + y], curvePointsSpeed[2 * i + 2 + x], curvePointsSpeed[2 * i + 2 + y]);
+    }
+}
+
 function displayPoints(){
     push();
     stroke(dark ? 255 : 0)
@@ -137,7 +208,7 @@ function displayPoints(){
 
 function createChecks(){
     checkRandomColor = createCheckbox('Random colors', true);
-    checkRandomColor.position(12, 104);
+    checkRandomColor.position(12, 126);
     checkRandomColor.style('font-family', 'Helvetica, serif');
     checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
     checkRandomColor.style('-webkit-user-select', 'none');
@@ -145,7 +216,7 @@ function createChecks(){
     checkRandomColor.style('user-select', 'none');
 
     checkBackgroundColor = createCheckbox('Dark background', dark);
-    checkBackgroundColor.position(12, 126);
+    checkBackgroundColor.position(12, 148);
     checkBackgroundColor.style('font-family', 'Helvetica, serif');
     checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
     checkBackgroundColor.style('-webkit-user-select', 'none');
@@ -167,6 +238,8 @@ function keyPressed(){
             rg = random(50);
             rb = random(30);
             curvePoints = []
+            curvePointsSpeed = [];
+            currentCurve = 0;
         }else {
             paused = false;
             timeStamp = millis() - pausedT * 1000
@@ -190,7 +263,9 @@ function keyPressed(){
 function clearScreen(){
     points = new Float32Array(0);
     curvePoints = [];
+    curvePointsSpeed = [];
     timeStamp = -(duration * 1000 + 1);
+    currentCurve = -1;
 }
 
 function touchStarted(){
