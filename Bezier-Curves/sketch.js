@@ -9,6 +9,8 @@ let paused = false;
 
 let checkRandomColor;
 let checkBackgroundColor;
+let checkShowBezierCurve;
+let checkShowConstantSpeed;
 
 let curvePoints = [];
 let curvePointsSpeed = [];
@@ -20,6 +22,14 @@ let rb;
 
 const x = 0;
 const y = 1;
+
+const instructions = [
+    "Bézier Curve Simulation",
+    "Click on the screen to place points",
+    "Press SPACE to start simulation",
+    "Press C to clear the screen",
+    "Press P to pause simulation",
+]
 
 p5.disableFriendlyErrors = true;
 
@@ -38,15 +48,14 @@ function setup() {
 function staticSetup(){
     push();
 
+
     dark ? (noStroke(), fill(255)) : (noStroke(), fill(0))
 
     textSize(16);
     textAlign(LEFT);
-    text("Bézier Curve Simulation", 15, 30);
-    text("Click on the screen to place points", 15, 52)
-    text("Press SPACE to start simulation", 15, 74);
-    text("Press C to clear the screen", 15, 96)
-    text("Press P to pause simulation", 15, 118);
+
+    for(let i = 0; i < instructions.length; i++)
+        text(instructions[i], 15, 8 + 22 * (i + 1));
 
     textSize(16);
     textAlign(RIGHT);
@@ -76,7 +85,7 @@ function draw(){
         if(t < duration && currentCurve === 0)
             displayLines();
 
-        else if(t > duration && currentCurve === 0) {
+        else if(t > duration && currentCurve === 0 && checkShowConstantSpeed.checked()) {
             currentCurve++;
             timeStamp = millis();
         }
@@ -177,8 +186,10 @@ function displayLines(){
     stroke(0, 100, 80);
     strokeWeight(10);
     point(localPoints[x], localPoints[y]);
-    curvePoints.push(localPoints[x]);
-    curvePoints.push(localPoints[y]);
+    if(checkShowBezierCurve.checked()) {
+        curvePoints.push(localPoints[x]);
+        curvePoints.push(localPoints[y]);
+    }
     pop();
 
     pop();
@@ -215,6 +226,22 @@ function createChecks(){
     checkRandomColor.style('-ms-user-select', 'none');
     checkRandomColor.style('user-select', 'none');
 
+    checkShowBezierCurve = createCheckbox('Show bezier curve', true);
+    checkShowBezierCurve.position(12, 170);
+    checkShowBezierCurve.style('font-family', 'Helvetica, serif');
+    checkShowBezierCurve.style('color', dark ? '#FFFFFF': '#505050');
+    checkShowBezierCurve.style('-webkit-user-select', 'none');
+    checkShowBezierCurve.style('-ms-user-select', 'none');
+    checkShowBezierCurve.style('user-select', 'none');
+
+    checkShowConstantSpeed = createCheckbox('Show constant speed curve', true);
+    checkShowConstantSpeed.position(12, 192);
+    checkShowConstantSpeed.style('font-family', 'Helvetica, serif');
+    checkShowConstantSpeed.style('color', dark ? '#FFFFFF': '#505050');
+    checkShowConstantSpeed.style('-webkit-user-select', 'none');
+    checkShowConstantSpeed.style('-ms-user-select', 'none');
+    checkShowConstantSpeed.style('user-select', 'none');
+
     checkBackgroundColor = createCheckbox('Dark background', dark);
     checkBackgroundColor.position(12, 148);
     checkBackgroundColor.style('font-family', 'Helvetica, serif');
@@ -226,6 +253,7 @@ function createChecks(){
         dark = !dark;
         checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
         checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
+        checkShowConstantSpeed.style('color', dark ? '#FFFFFF' : '#505050');
     });
 
 }
@@ -269,7 +297,7 @@ function clearScreen(){
 }
 
 function touchStarted(){
-    if(!(mouseX < 250 && mouseY < 200)) {
+    if(!(mouseX < 250 && mouseY < 300)) {
         let newPoints = new Float32Array(points.length + 2);
         newPoints.set(points);
         newPoints.set([mouseX, mouseY], points.length);
