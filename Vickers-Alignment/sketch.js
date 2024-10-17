@@ -38,7 +38,7 @@ data["time"].setHours(data["time"].getHours() - 8);
 
 
 function preload(){
-    bg = loadImage('images/background_.jpg');
+    bg = loadImage('images/background_knoop.jpg');
     sample = loadImage('images/sample_r.png');
 }
 function windowResized(){
@@ -103,7 +103,7 @@ function setup(){
     measuringKnob = new Knob(windowWidth * 9 / 10, matchHeight ? 0.184 * bgHeight : 0.184 * bgHeight - (bgHeight - windowHeight) / 2, measuringRadius,
         baseKnob.theta0, 4 * 360 + baseKnob.theta0, random(baseKnob.theta0, 1.7 * 360), 12, measuringKnobShape);
     lensKnob = new Knob(windowWidth / 2.1, matchHeight ? 0.65 * bgHeight : 0.65 * bgHeight - (bgHeight - windowHeight) / 2, lensRadius,
-    -180, -90, -180, 0, lensKnobShape, 7, 0);
+        -180, -90, -180, 0, lensKnobShape, 7, 0);
 
     knobs.push(focusKnob);
     knobs.push(measuringKnob);
@@ -211,7 +211,7 @@ function drawFilars(){
         baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) - min(lensRadius / 2.5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), 0);
 
     line(baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta), lensRadius / 3.5,
-            baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) -min(lensRadius / 5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), lensRadius / 3.5);
+        baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) -min(lensRadius / 5, baseKnob.theta * 2 * lensRadius / (baseKnob.upperTheta - baseKnob.lowerTheta) + lensRadius - 5), lensRadius / 3.5);
 
     pop();
 

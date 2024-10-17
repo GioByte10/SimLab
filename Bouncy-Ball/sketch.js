@@ -1,3 +1,4 @@
+const FPS = 60;
 let ball;
 let gravity = 0.1;
 let vy = 0;
@@ -7,11 +8,12 @@ let crx = 1;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    ball = new Ball(width / 2, height / 2 - 100, 20);
-    frameRate(60);
+    frameRate(FPS);
 
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
+
+    ball = new Ball(width / 2, height / 2 - 100, 20);
 }
 
 function draw() {
@@ -39,9 +41,7 @@ function draw() {
         ball.y = height - ball.radius;
         ball.y += vy;
     }
-    //console.log(vy)
 
-    // Display the ball
     ball.display();
 }
 

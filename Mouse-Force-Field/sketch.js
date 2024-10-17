@@ -1,4 +1,4 @@
-const fps = 60;
+const FPS = 60;
 
 let particles = [];
 let n = 1;
@@ -64,7 +64,7 @@ function staticSetup(){
 
 function setup(){
     createCanvas(windowWidth, windowHeight);
-    frameRate(fps);
+    frameRate(FPS);
     angleMode(DEGREES);
 
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))

@@ -11,7 +11,7 @@ let lensKnob;
 let inputButton;
 let done = false;
 
-let filarBounds = [-520, -350, 436, 600];
+let filarBounds = [-560, -380, 370, 660];
 
 let bgHeight;
 let bgWidth;

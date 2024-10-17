@@ -96,7 +96,7 @@ let materialsMap = {
 };
 
 function windowResized(){
-    createCanvas(windowWidth, windowHeight);
+    resizeCanvas(windowWidth, windowHeight);
 
     removeDropdowns();
     createDropdowns();

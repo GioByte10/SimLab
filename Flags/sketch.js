@@ -1,6 +1,4 @@
-// noinspection JSUnusedGlobalSymbols
-
-let fps = 60;
+const FPS = 60;
 let selection;
 let select;
 
@@ -18,7 +16,7 @@ let imageLoaded = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight, SVG);
-  frameRate(fps);
+  frameRate(FPS);
 
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
