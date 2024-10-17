@@ -253,6 +253,7 @@ function createChecks(){
         dark = !dark;
         checkBackgroundColor.style('color', dark ? '#FFFFFF': '#505050');
         checkRandomColor.style('color', dark ? '#FFFFFF': '#505050');
+        checkShowBezierCurve.style('color', dark ? '#FFFFFF' : '#505050');
         checkShowConstantSpeed.style('color', dark ? '#FFFFFF' : '#505050');
     });
 
