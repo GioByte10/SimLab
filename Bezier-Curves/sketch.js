@@ -234,7 +234,7 @@ function createChecks(){
     checkShowBezierCurve.style('-ms-user-select', 'none');
     checkShowBezierCurve.style('user-select', 'none');
 
-    checkShowConstantSpeed = createCheckbox('Show constant speed curve', true);
+    checkShowConstantSpeed = createCheckbox('Show constant speed curve', false);
     checkShowConstantSpeed.position(12, 192);
     checkShowConstantSpeed.style('font-family', 'Helvetica, serif');
     checkShowConstantSpeed.style('color', dark ? '#FFFFFF': '#505050');
