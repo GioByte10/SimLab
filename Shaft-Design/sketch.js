@@ -92,7 +92,8 @@ let materialsMap = {
     "ASTM 1060 HR": [ASTM, 98, 54],
     "ASTM 1080 HR": [ASTM, 112, 61.5],
     "ASTM 1095 HR": [ASTM, 120, 66],
-    "Custom CD" : [ASTM, 75, 50]
+    "Custom CD1" : [ASTM, 75, 50],
+    "Custom CD2" : [ASTM, 82, 58]
 };
 
 function windowResized(){
@@ -155,6 +156,8 @@ function draw(){
     background(220);
     staticSetup();
 
+    //console.log(d);
+
     if(d === undefined || prevd === undefined || abs((d - prevd) / prevd) > 0.001)
         calculate();
 
@@ -185,7 +188,19 @@ function calculate(){
     let ke = 1 - 0.08 * jStat.normal.inv(textBoxes[RE].value() / 100, 0, 1);
     let kf = 1;
 
+    console.log("----------------------")
+    console.log("ka: " + ka);
+    console.log("kb: " + kb);
+    console.log("kc: " + kc);
+    console.log("kd: " + kd);
+    console.log("ke: " + ke);
+    console.log("kf: " + kf);
+
+    console.log("Kt: " + Kt);
+    console.log("Kts: " + Kts);
+
     let Sep = Sut <= 200 ? 0.5 * Sut : 100;
+    console.log("Sep: " + Sep);
     let Se = ka * kb * kc * kd * ke * kf * Sep;
 
     let a_sqrt = 0.246 - (3.08 * 10 ** -3 * Sut) + (1.51 * 10 ** -5 * Sut ** 2) - (2.67 * 10 ** -8 * Sut ** 3);
@@ -201,7 +216,11 @@ function calculate(){
     let Ta = textBoxes[TA].value() * momentC;
 
     nf = textBoxes[FOS].value();
+
+    console.log("d: " + d)
     d = de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs);
+    console.log("d: " + d);
+
     if(d !== 0)
         iterationHistory[it] = (it + 1) + ". d = " + (d * lengthC).toFixed(3) + ' ' + lengthUnit +
         "  D = " + (Dd * d * lengthC).toFixed(3) + ' ' + lengthUnit +
@@ -214,9 +233,44 @@ function calculate(){
 }
 
 function de_goodman(Se, Mm, Ma, Tm, Ta, Kf, Kfs){
+
+    console.log("Kf: " + Kf);
+    console.log("Ma: " + Ma);
+    console.log("Ta: " + Ta);
+    console.log("Kfs: " + Kfs);
+    console.log("Mm: " + Mm);
+    console.log("Tm: " + Tm);
+    console.log("Se: " + Se);
+    console.log("Sut: " + Sut);
+
     return Math.pow((16 * nf / PI) *
         ((1 / (Se * 1000)) * sqrt(4 * (Kf * Ma) ** 2 + 3 * (Kfs * Ta) ** 2) +
         (1 / (Sut * 1000)) * sqrt(4 * (Kf * Mm) ** 2 + 3 * (Kfs * Tm) ** 2)), 1 / 3);
+}
+
+function de_gerber(Se, Mm, Ma, Tm, Ta, Kf, Kfs) {
+
+    console.log("Kf: " + Kf);
+    console.log("Ma: " + Ma);
+    console.log("Ta: " + Ta);
+    console.log("Kfs: " + Kfs);
+    console.log("Mm: " + Mm);
+    console.log("Tm: " + Tm);
+    console.log("Se: " + Se);
+    console.log("Sut: " + Sut);
+
+    let A = sqrt(4 * sq(Kf * Ma) + 3 * sq(Kfs * Ta));
+    let B = sqrt(4 * sq(Kf * Mm) + 3 * sq(Kfs * Tm));
+
+    console.log("A: " + A);
+    console.log("B: " + B);
+
+    if(A === 0)
+        return 0;
+
+    return Math.pow(((8 * nf * A) / (PI * Se * 1000)) *
+        (1 + Math.pow(1 + sq((2 * B * Se) / (A * Sut * 1000)), 1 / 2)), 1 / 3);
+
 }
 
 
