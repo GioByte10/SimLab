@@ -32,9 +32,9 @@ function staticSetup(){
     }
 
     textSize(15);
-    text("k = " + kSlider.value(), kSlider.position().x - 50, kSlider.position().y);
-    text("C = " + cSlider.value(), cSlider.position().x - 50, cSlider.position().y);
-    text("I = " + iSlider.value(), iSlider.position().x - 50, iSlider.position().y);
+    text("k = " + kSlider.value(), kSlider.position().x - 55, kSlider.position().y);
+    text("C = " + cSlider.value(), cSlider.position().x - 55, cSlider.position().y);
+    text("I = " + iSlider.value(), iSlider.position().x - 55, iSlider.position().y);
 
     translate(origin[0], origin[1]);
     strokeWeight(1.4)
@@ -57,10 +57,10 @@ function setup(){
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
-    createUI();
-    oscillator = new Oscillator();
-
     origin = [250, height - 250]
+
+    createUI();
+    oscillator = new Oscillator(origin, 0);
 
     let x = origin[0] + 550;
     let y = 100;
@@ -107,7 +107,7 @@ function draw(){
 
 function createUI(){
 
-    let x = 70;
+    let x = 75;
     let y = 130;
     kSlider = createSlider(0, 100, 10);
     kSlider.position(x, y);
@@ -133,7 +133,7 @@ function createUI(){
 }
 
 class Oscillator{
-    constructor() {
+    constructor(origin, theta0) {
         this.l = 200;
         this.theta = 100;
         this.w = 0;
@@ -143,6 +143,8 @@ class Oscillator{
         this.C = cSlider.value();
         this.I = iSlider.value();
 
+        this.origin = origin;
+        this.theta0 = theta0;
         this.values = [];
     }
     display(){
@@ -152,10 +154,10 @@ class Oscillator{
 
         push();
 
-        translate(origin[0], origin[1]);
+        translate(this.origin[0], this.origin[1]);
+        rotate(this.theta0);
         strokeWeight(2);
         rotate(-this.theta);
-        //line(50, 0, this.l - 50, 0);
 
         let t = 15
 
@@ -167,6 +169,7 @@ class Oscillator{
         arc(this.l, 0, 2 * t, 2 * t, 270, 90, OPEN);
         circle(0, 0, 12);
         circle(this.l, 0, 12);
+
         pop();
 
         this.graph();
@@ -175,27 +178,24 @@ class Oscillator{
 
     graph(){
         push();
-        translate(origin[0], origin[1]);
+        translate(this.origin[0], this.origin[1]);
         this.values.push(this.theta / 2)
 
         if(this.values.length > 700)
             this.values.shift();
 
-        let desiredTheta = atan2(-mouseY + origin[1], mouseX - origin[0]);
+        let desiredTheta = atan2(-mouseY + this.origin[1], mouseX - this.origin[0]);
         desiredTheta = desiredTheta < 0 ? desiredTheta + 360 : desiredTheta;
-
-        console.log(this.theta);
-        console.log("desired: " + desiredTheta);
 
         push();
         setLineDash([7, 7]);
-        line(500,  desiredTheta / 2 -200, 500 + this.values.length, desiredTheta / 2 -200);
+        line(500,  -desiredTheta / 2, 500 + this.values.length, -desiredTheta / 2);
         pop();
 
         noFill();
         beginShape()
         for(let i = 0; i < this.values.length; i++){
-            vertex(500 + i, this.values[i] - 200);
+            vertex(500 + i, -this.values[i]);
         }
 
         endShape();
@@ -204,8 +204,8 @@ class Oscillator{
 
     applyForce(){
         push();
-        translate(origin[0], origin[1]);
-        let desiredTheta = atan2(-mouseY + origin[1], mouseX - origin[0]);
+        translate(this.origin[0], this.origin[1]);
+        let desiredTheta = atan2(-mouseY + this.origin[1], mouseX - this.origin[0]);
         desiredTheta = desiredTheta < 0 ? desiredTheta + 360 : desiredTheta;
 
         let deltaPhase = desiredTheta - ((this.theta % 360) < 0 ? this.theta % 360 + 360 : this.theta % 360);
@@ -227,9 +227,6 @@ class Oscillator{
         this.w += this.a * 0.05;
         this.theta += this.w * 0.05;
 
-        // console.log("a: " + this.a);
-        // console.log("w: " + this.w);
-        // console.log("theta: " + this.theta);
         pop();
     }
 
