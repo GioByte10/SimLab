@@ -101,20 +101,20 @@ function setup(){
     latexDiv.style('text-align', 'right');
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
 
-    latexDiv = createDiv('1.- Solve for \\(\\alpha\\) using the previous eq.,');
-    latexDiv.position(x + 200, y + 25);
-    latexDiv.style('text-align', 'right');
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
-
-    latexDiv = createDiv('2.- Numerically integrate \\(\\alpha\\) to obtain \\(\\omega\\)');
-    latexDiv.position(x + 200, y + 60);
-    latexDiv.style('text-align', 'right');
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
-
-    latexDiv = createDiv('3.- Numerically integrate \\(\\omega\\) to obtain \\(\\theta\\)');
-    latexDiv.position(x + 200, y + 95);
-    latexDiv.style('text-align', 'right');
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
+    // latexDiv = createDiv('1.- Solve for \\(\\alpha\\) using the previous eq.,');
+    // latexDiv.position(x + 200, y + 25);
+    // latexDiv.style('text-align', 'right');
+    // MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
+    //
+    // latexDiv = createDiv('2.- Numerically integrate \\(\\alpha\\) to obtain \\(\\omega\\)');
+    // latexDiv.position(x + 200, y + 60);
+    // latexDiv.style('text-align', 'right');
+    // MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
+    //
+    // latexDiv = createDiv('3.- Numerically integrate \\(\\omega\\) to obtain \\(\\theta\\)');
+    // latexDiv.position(x + 200, y + 95);
+    // latexDiv.style('text-align', 'right');
+    // MathJax.Hub.Queue(["Typeset", MathJax.Hub, latexDiv.elt]);
 
     x = width - 550;
 
