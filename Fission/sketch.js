@@ -189,9 +189,9 @@ class Neutron {
     }
 }
 
-function touchStarted(){
-    neutrons.push(new Neutron(mouseX, mouseY, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
-}
+// function touchStarted(){
+//     neutrons.push(new Neutron(mouseX, mouseY, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
+// }
 
 function debug(){
     push();
