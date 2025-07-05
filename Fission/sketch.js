@@ -1,6 +1,10 @@
 const FPS = 30;
+
 const gridSpacing = 50;
 const marginSpacing = 100;
+
+let rows;
+let columns;
 
 const uraniumRadius = 13;
 const neutronRadius = 5;
@@ -17,35 +21,43 @@ function preload(){
 }
 
 function staticSetup(){
-    text()
+    textSize(20);
+    textAlign(RIGHT);
+    text(neutrons.length + " neutrons", width - 25, 35);
+    text(uraniums.filter(uranium => uranium.active).length + " uraniums", width - 25, 60);
 }
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     frameRate(FPS);
 
+    pixelDensity(1);
+
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
-    let rows = floor((height - (4 / 3) * marginSpacing) / gridSpacing) + 1;
-    let columns = floor((width - 2 * marginSpacing) / gridSpacing) + 1;
+    rows = floor((height - (9 / 6) * marginSpacing) / gridSpacing) + 1;
+    columns = floor((width - 2 * marginSpacing) / gridSpacing) + 1;
 
     let horizontalOffset = (width - marginSpacing - ((columns - 1) * gridSpacing + marginSpacing)) / 2;
-    let verticalOffset = (height - marginSpacing - ((rows - 1) * gridSpacing + marginSpacing)) / 2;
+    let verticalOffset = (height - marginSpacing - ((rows - 1) * gridSpacing + marginSpacing)) / 2 + 10;
 
     for(let i = 0; i < rows; i++)
         for(let j = 0; j < columns; j++)
             uraniums.push(new Uranium(marginSpacing + horizontalOffset + j * gridSpacing,
                 marginSpacing + verticalOffset + i * gridSpacing, uraniumRadius));
 
-    for(let i = 0; i < n; i++)
-        neutrons.push(new Neutron(random(0, width), random(0, height), random(-3, 3), random(-3, 3), neutronRadius))
+    neutrons.push(new Neutron(random(0, width), random(0, height), 0, 0, neutronRadius));
+    let center = createVector(width / 2, height / 2);
+    neutrons[0].v =(center.sub(neutrons[0].p)).setMag(random(0, 3))
 }
 
 function draw() {
     background(255);
 
-    for(let i = 0; i < uraniums.length; i++)
+    staticSetup();
+
+    for(let i = uraniums.length - 1; i >= 0; i--)
         uraniums[i].display()
 
     for(let i = neutrons.length - 1; i >= 0; i--)
@@ -65,20 +77,27 @@ class Uranium {
         this.p = createVector(x, y);
         this.radius = radius;
         this.active = true;
+
+        this.neutronReleaseCount = 3;
     }
 
     display() {
         push();
         this.active ? fill(34, 140, 255) : fill(220);
         circle(this.p.x, this.p.y, this.radius * 2);
+
+        if(!this.active){
+            this.active = random(0, 1) < 0.0001;
+        }
         pop();
     }
 
     split(){
         this.active = false;
-        neutrons.push(new Neutron(this.p.x, this.p.y, random(-3, 3), random(-3, 3), neutronRadius));
-        neutrons.push(new Neutron(this.p.x, this.p.y, random(-3, 3), random(-3, 3), neutronRadius));
-        neutrons.push(new Neutron(this.p.x, this.p.y, random(-3, 3), random(-3, 3), neutronRadius));
+
+        for(let i = 0; i < this.neutronReleaseCount; i++) {
+            neutrons.push(new Neutron(this.p.x, this.p.y, random(-5, 5), random(-5, 5), neutronRadius));
+        }
     }
 }
 
@@ -87,33 +106,34 @@ class Neutron {
         this.p = createVector(x, y)
         this.v = createVector(vx, vy);
         this.radius = radius;
+        this.originalRadius = radius;
 
         this.despawn = false;
         this.collided = false;
         this.collisionFrame = 0;
-        this.collisionFrameCount = 10;
-        this.radiusDecrease = this.radius / this.collisionFrameCount;
+        this.collisionFrameCount = 5;
+
+        this.color = color(100);
     }
 
     display(){
         push();
-        fill(100);
+        fill(this.color);
         this.p.add(this.v)
         circle(this.p.x, this.p.y, this.radius * 2);
 
-        let df = frameCount - this.collisionFrame;
-        this.despawn = (this.p.x < -this.radius || this.p.x > width + this.radius ||
-            this.p.y < -this.radius || this.p.y > height + this.radius ||
-            (this.collided && df >= this.collisionFrameCount))
+        this.despawn ||= (this.p.x < -this.radius || this.p.x > width + this.radius ||
+            this.p.y < -this.radius || this.p.y > height + this.radius)
 
         pop();
     }
 
     despawnAnimation(){
-        this.v.x = 0;
-        this.v.y = 0;
+        let completeness = (frameCount - this.collisionFrame) / this.collisionFrameCount;
 
-        this.radius -= this.radiusDecrease;
+        this.color = color(100, (1 - completeness) * 255)
+        this.radius = this.originalRadius * (1 - completeness);
+        this.despawn = completeness >= 1;
     }
 
     checkCollision(){
@@ -129,22 +149,37 @@ class Neutron {
             let distance = sqrt(sq(this.p.x - uraniums[i].p.x) + sq(this.p.y - uraniums[i].p.y));
 
             if(distance < this.radius + uraniums[i].radius){
-                uraniums[i].split()
-                this.collided = true
                 geigerSound.play()
-                this.collisionFrame = frameCount;
-                return;
+                uraniums[i].split()
 
+                this.collided = true
+                this.collisionFrame = frameCount;
+
+                this.v.x = 0;
+                this.v.y = 0;
+
+                return;
             }
         }
     }
 }
 
 function debug(){
+    push();
     if(keyIsPressed && keyCode === 68) {    // D Key
-        fill(0);
+        fill(0)
         text(mouseX + ", " + mouseY, mouseX + 10, mouseY - 10)
+
+        stroke(255, 0, 0);
         line(0, mouseY, width, mouseY);
         line(mouseX, 0, mouseX, height);
+
+        stroke(0)
+        for(let i = 0; i < columns; i++)
+            line(uraniums[i].p.x, 0, uraniums[i].p.x, height);
+
+        for(let i = 0; i < rows; i++)
+            line(0, uraniums[i * columns].p.y, width, uraniums[i * columns].p.y);
     }
+    pop();
 }
