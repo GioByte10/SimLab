@@ -3,9 +3,14 @@ const FPS = 30;
 const gridSpacing = 50;
 const marginSpacing = 100;
 
+let horizontalOffset;
+let verticalOffset;
+
 const uraniumRadius = 13;
 const neutronRadius = 5;
 const neutronSpeed = 5;
+
+const enclosed = false;
 
 let rows;
 let columns;
@@ -28,7 +33,7 @@ function staticSetup(){
     text(neutrons.length + " neutrons", width - 25, 35);
     text(uraniums.filter(uranium => uranium.active).length + " uraniums", width - 25, 60);
 
-    let legendStart = width / 2 - 300;
+    let legendStart = width / 2 - 200;
 
     textAlign(LEFT, CENTER)
     fill(34, 140, 255)
@@ -64,8 +69,8 @@ function setup() {
     rows = floor((height -2 * marginSpacing) / gridSpacing) + 1;
     columns = floor((width - 2 * marginSpacing) / gridSpacing) + 1;
 
-    let horizontalOffset = (width - marginSpacing - ((columns - 1) * gridSpacing + marginSpacing)) / 2;
-    let verticalOffset = (height - marginSpacing - ((rows - 1) * gridSpacing + marginSpacing)) / 2 + 10;
+    horizontalOffset = (width - marginSpacing - ((columns - 1) * gridSpacing + marginSpacing)) / 2;
+    verticalOffset = (height - marginSpacing - ((rows - 1) * gridSpacing + marginSpacing)) / 2 + 10;
 
     for(let i = 0; i < rows; i++)
         for(let j = 0; j < columns; j++)
@@ -146,6 +151,14 @@ class Neutron {
         fill(this.color);
         this.p.add(this.v)
         circle(this.p.x, this.p.y, this.radius * 2);
+
+        if(enclosed){
+            if(this.p.x < this.radius || this.p.x > width - this.radius)
+                this.v.x = -this.v.x;
+
+            if(this.p.y < this.radius || this.p.y > height - this.radius)
+                this.v.y = -this.v.y;
+        }
 
         this.despawn ||= (this.p.x < -this.radius || this.p.x > width + this.radius ||
             this.p.y < -this.radius || this.p.y > height + this.radius)
