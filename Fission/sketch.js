@@ -3,11 +3,12 @@ const FPS = 30;
 const gridSpacing = 50;
 const marginSpacing = 100;
 
-let rows;
-let columns;
-
 const uraniumRadius = 13;
 const neutronRadius = 5;
+const neutronSpeed = 5;
+
+let rows;
+let columns;
 
 const n = 1;
 
@@ -21,10 +22,34 @@ function preload(){
 }
 
 function staticSetup(){
+    push();
     textSize(20);
     textAlign(RIGHT);
     text(neutrons.length + " neutrons", width - 25, 35);
     text(uraniums.filter(uranium => uranium.active).length + " uraniums", width - 25, 60);
+
+    let legendStart = width / 2 - 300;
+
+    textAlign(LEFT, CENTER)
+    fill(34, 140, 255)
+    circle(legendStart, height - 40, uraniumRadius * 2);
+
+    fill(0);
+    text("Uranium-235", legendStart + uraniumRadius + 7, height - 39);
+
+    fill(220);
+    circle(legendStart + uraniumRadius + 7 + 160, height - 40, uraniumRadius * 2);
+
+    fill(0);
+    text("non-fissile", legendStart + 2 * uraniumRadius + 7 + 160 + 7, height - 39);
+
+    fill(100);
+    circle(legendStart + 2 * uraniumRadius + 7 + 160 + 7 + 130, height - 40, neutronRadius * 2);
+
+    fill(0);
+    text("Neutron", legendStart + 2 * uraniumRadius + 7 + 160 + 7 + 130 + neutronRadius + 7, height - 40)
+
+    pop();
 }
 
 function setup() {
@@ -36,7 +61,7 @@ function setup() {
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
-    rows = floor((height - (9 / 6) * marginSpacing) / gridSpacing) + 1;
+    rows = floor((height -2 * marginSpacing) / gridSpacing) + 1;
     columns = floor((width - 2 * marginSpacing) / gridSpacing) + 1;
 
     let horizontalOffset = (width - marginSpacing - ((columns - 1) * gridSpacing + marginSpacing)) / 2;
@@ -55,21 +80,21 @@ function setup() {
 function draw() {
     background(255);
 
-    staticSetup();
-
     for(let i = uraniums.length - 1; i >= 0; i--)
         uraniums[i].display()
 
-    for(let i = neutrons.length - 1; i >= 0; i--)
-        if(neutrons[i].despawn)
+    for(let i = neutrons.length - 1; i >= 0; i--) {
+        if (neutrons[i].despawn)
             neutrons.splice(i, 1);
 
         else {
             neutrons[i].display()
             neutrons[i].checkCollision()
         }
+    }
 
     debug()
+    staticSetup();
 }
 
 class Uranium {
@@ -96,7 +121,7 @@ class Uranium {
         this.active = false;
 
         for(let i = 0; i < this.neutronReleaseCount; i++) {
-            neutrons.push(new Neutron(this.p.x, this.p.y, random(-5, 5), random(-5, 5), neutronRadius));
+            neutrons.push(new Neutron(this.p.x, this.p.y, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
         }
     }
 }
@@ -162,6 +187,10 @@ class Neutron {
             }
         }
     }
+}
+
+function touchStarted(){
+    neutrons.push(new Neutron(mouseX, mouseY, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
 }
 
 function debug(){
