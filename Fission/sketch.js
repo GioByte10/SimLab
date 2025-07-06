@@ -1,28 +1,32 @@
 const FPS = 60;
+const enclosed = false;
 
-const gridSpacing = 50;
+const gridSpacing = 51;
 const marginSpacing = 100;
 
 let horizontalOffset;
 let verticalOffset;
 
-const uraniumRadius = 13;
+const nucleusRadius = 13;
 const neutronRadius = 5;
-const neutronSpeed = 5 / (FPS / 30);
+const neutronSpeed = 6 / (FPS / 30);
 
-const enclosed = false;
+let neutrons = [];
+let nuclei = [];
 
 let rows;
 let columns;
-
-const n = 1;
-
-let neutrons = [];
-let uraniums = [];
+let debug = false;
 
 let geigerSound;
 
-let debug = false;
+const nucleusTypes = {
+    NON_FISSILE: 0,
+    URANIUM: 1,
+    XENON: 2
+}
+const {NON_FISSILE, URANIUM, XENON} = nucleusTypes;
+
 
 function preload(){
     geigerSound = loadSound("sound/Geiger_1.wav");
@@ -31,30 +35,38 @@ function preload(){
 function staticSetup(){
     push();
     textSize(20);
-    textAlign(RIGHT);
+    textAlign(RIGHT, CENTER);
     text(neutrons.length + " neutrons", width - 25, 35);
-    text(uraniums.filter(uranium => uranium.active).length + " uraniums", width - 25, 60);
+    text(nuclei.filter(nucleus => nucleus.type === URANIUM).length + " uraniums", width - 25, 60);
 
-    let legendStart = width / 2 - 200;
+    text(((nuclei.filter(nucleus => nucleus.type === URANIUM).length / nuclei.length) * 100).toFixed(1) + "% enrichment", width - 30, height - 39);
 
-    textAlign(LEFT, CENTER)
+    let legendStart = width / 2 - 280;
+
+    textAlign(LEFT, CENTER);
     fill(34, 140, 255)
-    circle(legendStart, height - 40, uraniumRadius * 2);
+    circle(legendStart, height - 40, nucleusRadius * 2);
 
     fill(0);
-    text("Uranium-235", legendStart + uraniumRadius + 7, height - 39);
-
-    fill(220);
-    circle(legendStart + uraniumRadius + 7 + 160, height - 40, uraniumRadius * 2);
-
-    fill(0);
-    text("non-fissile", legendStart + 2 * uraniumRadius + 7 + 160 + 7, height - 39);
+    text("Uranium-235", legendStart + nucleusRadius + 7, height - 39);
 
     fill(100);
-    circle(legendStart + 2 * uraniumRadius + 7 + 160 + 7 + 130, height - 40, neutronRadius * 2);
+    circle(legendStart + nucleusRadius + 7 + 160, height - 40, nucleusRadius * 2);
 
     fill(0);
-    text("Neutron", legendStart + 2 * uraniumRadius + 7 + 160 + 7 + 130 + neutronRadius + 7, height - 40)
+    text("Xenon-135", legendStart + 2 * nucleusRadius + 7 + 160 + 7, height - 39);
+
+    fill(220);
+    circle(legendStart + nucleusRadius + 7 + 160 + 160, height - 40, nucleusRadius * 2);
+
+    fill(0);
+    text("non-fissile", legendStart + 2 * nucleusRadius + 7 + 160 + 160 + 7, height - 39);
+
+    fill(100);
+    circle(legendStart + 2 * nucleusRadius + 7 + 160 + 160 + 7 + 127, height - 40, neutronRadius * 2);
+
+    fill(0);
+    text("Neutron", legendStart + 2 * nucleusRadius + 7 + 160 + 160 + 7 + 127 + neutronRadius + 7, height - 40)
 
     pop();
 }
@@ -74,19 +86,19 @@ function setup() {
 
     for(let i = 0; i < rows; i++)
         for(let j = 0; j < columns; j++)
-            uraniums.push(new Uranium(marginSpacing + horizontalOffset + j * gridSpacing,
-                marginSpacing + verticalOffset + i * gridSpacing, uraniumRadius));
+            nuclei.push(new Nucleus(marginSpacing + horizontalOffset + j * gridSpacing,
+                marginSpacing + verticalOffset + i * gridSpacing, nucleusRadius, URANIUM));
 
-    neutrons.push(new Neutron(0, 0, 0, 0, neutronRadius));
+    neutrons.push(new Neutron(random(0, width), random(0, height), 0, 0, neutronRadius));
     let center = createVector(width / 2, height / 2);
-    neutrons[0].v =(center.sub(neutrons[0].p)).setMag(1);
+    neutrons[0].v =(center.sub(neutrons[0].p)).setMag(2);
 }
 
 function draw() {
     background(255);
 
-    for(let i = uraniums.length - 1; i >= 0; i--)
-        uraniums[i].display()
+    for(let i = nuclei.length - 1; i >= 0; i--)
+        nuclei[i].display()
 
     for(let i = neutrons.length - 1; i >= 0; i--) {
         if (neutrons[i].despawn)
@@ -104,39 +116,47 @@ function draw() {
         showGrid();
 }
 
-class Uranium {
-    constructor(x, y, radius) {
+class Nucleus {
+    constructor(x, y, radius, type) {
         this.p = createVector(x, y);
         this.radius = radius;
-        this.active = true;
+        this.type = type;
+        console.log(this.type)
 
         this.neutronReleaseCount = 3;
     }
 
     display() {
         push();
-        this.active ? fill(34, 140, 255) : fill(220);
+        this.type === URANIUM ? fill(34, 140, 255) : (this.type === XENON ? fill(100) : fill(220));
         circle(this.p.x, this.p.y, this.radius * 2);
 
-        if(!this.active){
-            this.active = random(0, 1) < (1-pow(1 - 0.0001, 30 / FPS));
+        if(this.type === NON_FISSILE){
+            let probUranium = (1 - pow(1 - 0.00011, 30 / FPS));
+            let probXenon = (1 - pow(1 - 0.00004, 30 / FPS));
+
+            console.log(probUranium, probXenon);
+
+            let r = random(0, 1);
+
+            this.type = r < probUranium ? URANIUM : (r < probUranium + probXenon ? XENON : NON_FISSILE);
         }
         pop();
     }
 
-    split(){
-        this.active = false;
+    capture(){
+        if(this.type === URANIUM)
+            for (let i = 0; i < this.neutronReleaseCount; i++)
+                neutrons.push(new Neutron(this.p.x, this.p.y, random(0, 2 * PI), random(0.5, neutronSpeed), neutronRadius));
 
-        for(let i = 0; i < this.neutronReleaseCount; i++) {
-            neutrons.push(new Neutron(this.p.x, this.p.y, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
-        }
+        this.type = NON_FISSILE;
     }
 }
 
 class Neutron {
-    constructor(x, y, vx, vy, radius) {
+    constructor(x, y, theta, v, radius) {
         this.p = createVector(x, y)
-        this.v = createVector(vx, vy);
+        this.v = createVector(v * cos(theta), v * sin(theta));
         this.radius = radius;
         this.originalRadius = radius;
 
@@ -193,16 +213,16 @@ class Neutron {
         if(debug) {
             push();
             stroke(6, 140, 24);
-            line(this.p.x, this.p.y, uraniums[index].p.x, uraniums[index].p.y);
+            line(this.p.x, this.p.y, nuclei[index].p.x, nuclei[index].p.y);
             pop()
         }
 
-        if(uraniums[index].active){
-            let distance = sqrt(sq(this.p.x - uraniums[index].p.x) + sq(this.p.y - uraniums[index].p.y));
+        if(nuclei[index].type !== NON_FISSILE){
+            let distance = sqrt(sq(this.p.x - nuclei[index].p.x) + sq(this.p.y - nuclei[index].p.y));
 
-            if(distance < neutronRadius + uraniumRadius){
+            if(distance < neutronRadius + nucleusRadius){
                 geigerSound.play()
-                uraniums[index].split()
+                nuclei[index].capture()
 
                 this.collided = true
                 this.collisionFrame = frameCount;
@@ -215,12 +235,14 @@ class Neutron {
 }
 
 // function touchStarted(){
-//     neutrons.push(new Neutron(mouseX, mouseY, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
+//     neutrons.push(new Neutron(mouseX, mouseY, random(0, 2 * PI), random(0.5, neutronSpeed), neutronRadius));
 // }
 
 function keyPressed(){
-    if(keyCode === 68){     //D Key
+    if(keyCode === 68){             // D Key
         debug = !debug;
+    }else if(keyCode === 83) {      // S Key
+        neutrons.push(new Neutron(random(0, width), random(0, height), random(0.5, 2 * PI), random(0, neutronSpeed), neutronRadius));
     }
 }
 
@@ -235,9 +257,9 @@ function showGrid(){
 
     stroke(0)
     for(let i = 0; i < columns; i++)
-        line(uraniums[i].p.x, 0, uraniums[i].p.x, height);
+        line(nuclei[i].p.x, 0, nuclei[i].p.x, height);
 
     for(let i = 0; i < rows; i++)
-        line(0, uraniums[i * columns].p.y, width, uraniums[i * columns].p.y);
+        line(0, nuclei[i * columns].p.y, width, nuclei[i * columns].p.y);
     pop();
 }
