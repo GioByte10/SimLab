@@ -1,7 +1,7 @@
 const FPS = 60;
 const enclosed = false;
 
-const gridSpacing = 51;
+const gridSpacing = 50;
 const marginSpacing = 100;
 
 let horizontalOffset;
@@ -121,7 +121,6 @@ class Nucleus {
         this.p = createVector(x, y);
         this.radius = radius;
         this.type = type;
-        console.log(this.type)
 
         this.neutronReleaseCount = 3;
     }
@@ -134,12 +133,19 @@ class Nucleus {
         if(this.type === NON_FISSILE){
             let probUranium = (1 - pow(1 - 0.00011, 30 / FPS));
             let probXenon = (1 - pow(1 - 0.00004, 30 / FPS));
-
-            console.log(probUranium, probXenon);
+            let probNeutron = (1 - pow(1 - 0.00001, 30 /FPS));
 
             let r = random(0, 1);
 
-            this.type = r < probUranium ? URANIUM : (r < probUranium + probXenon ? XENON : NON_FISSILE);
+            if(r < probUranium)
+                this.type = URANIUM;
+
+            else if(r < probUranium + probXenon)
+                this.type = XENON;
+
+            else if(r < probUranium + probXenon + probNeutron)
+                neutrons.push(new Neutron(this.p.x, this.p.y, random(0, 2* PI), random(0.5, neutronSpeed / 2), neutronRadius));
+
         }
         pop();
     }
@@ -239,8 +245,12 @@ class Neutron {
 // }
 
 function keyPressed(){
-    if(keyCode === 68){             // D Key
+    if(keyCode === 67)
+        neutrons = [];
+
+    else if(keyCode === 68){             // D Key
         debug = !debug;
+
     }else if(keyCode === 83) {      // S Key
         neutrons.push(new Neutron(random(0, width), random(0, height), random(0.5, 2 * PI), random(0, neutronSpeed), neutronRadius));
     }
