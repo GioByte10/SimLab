@@ -1,4 +1,4 @@
-const FPS = 30;
+const FPS = 60;
 
 const gridSpacing = 50;
 const marginSpacing = 100;
@@ -8,7 +8,7 @@ let verticalOffset;
 
 const uraniumRadius = 13;
 const neutronRadius = 5;
-const neutronSpeed = 5;
+const neutronSpeed = 5 / (FPS / 30);
 
 const enclosed = false;
 
@@ -21,6 +21,8 @@ let neutrons = [];
 let uraniums = [];
 
 let geigerSound;
+
+let debug = false;
 
 function preload(){
     geigerSound = loadSound("sound/Geiger_1.wav");
@@ -61,8 +63,6 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     frameRate(FPS);
 
-    pixelDensity(1);
-
     if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
         pixelDensity(1);
 
@@ -77,9 +77,9 @@ function setup() {
             uraniums.push(new Uranium(marginSpacing + horizontalOffset + j * gridSpacing,
                 marginSpacing + verticalOffset + i * gridSpacing, uraniumRadius));
 
-    neutrons.push(new Neutron(random(0, width), random(0, height), 0, 0, neutronRadius));
+    neutrons.push(new Neutron(0, 0, 0, 0, neutronRadius));
     let center = createVector(width / 2, height / 2);
-    neutrons[0].v =(center.sub(neutrons[0].p)).setMag(random(0, 3))
+    neutrons[0].v =(center.sub(neutrons[0].p)).setMag(1);
 }
 
 function draw() {
@@ -98,8 +98,10 @@ function draw() {
         }
     }
 
-    debug()
     staticSetup();
+
+    if(debug)
+        showGrid();
 }
 
 class Uranium {
@@ -117,7 +119,7 @@ class Uranium {
         circle(this.p.x, this.p.y, this.radius * 2);
 
         if(!this.active){
-            this.active = random(0, 1) < 0.0001;
+            this.active = random(0, 1) < (1-pow(1 - 0.0001, 30 / FPS));
         }
         pop();
     }
@@ -180,23 +182,33 @@ class Neutron {
             return;
         }
 
-        for(let i = 0; i < uraniums.length; i++){
-            if(!uraniums[i].active)
-                continue;
+        let col = round((this.p.x - horizontalOffset - marginSpacing) / gridSpacing);
+        let row = round((this.p.y - verticalOffset - marginSpacing) / gridSpacing);
 
-            let distance = sqrt(sq(this.p.x - uraniums[i].p.x) + sq(this.p.y - uraniums[i].p.y));
+        col = constrain(col, 0, columns - 1);
+        row = constrain(row, 0, rows - 1);
 
-            if(distance < this.radius + uraniums[i].radius){
+        let index = row * columns + col;
+
+        if(debug) {
+            push();
+            stroke(6, 140, 24);
+            line(this.p.x, this.p.y, uraniums[index].p.x, uraniums[index].p.y);
+            pop()
+        }
+
+        if(uraniums[index].active){
+            let distance = sqrt(sq(this.p.x - uraniums[index].p.x) + sq(this.p.y - uraniums[index].p.y));
+
+            if(distance < neutronRadius + uraniumRadius){
                 geigerSound.play()
-                uraniums[i].split()
+                uraniums[index].split()
 
                 this.collided = true
                 this.collisionFrame = frameCount;
 
                 this.v.x = 0;
                 this.v.y = 0;
-
-                return;
             }
         }
     }
@@ -206,22 +218,26 @@ class Neutron {
 //     neutrons.push(new Neutron(mouseX, mouseY, random(-neutronSpeed, neutronSpeed), random(-neutronSpeed, neutronSpeed), neutronRadius));
 // }
 
-function debug(){
-    push();
-    if(keyIsPressed && keyCode === 68) {    // D Key
-        fill(0)
-        text(mouseX + ", " + mouseY, mouseX + 10, mouseY - 10)
-
-        stroke(255, 0, 0);
-        line(0, mouseY, width, mouseY);
-        line(mouseX, 0, mouseX, height);
-
-        stroke(0)
-        for(let i = 0; i < columns; i++)
-            line(uraniums[i].p.x, 0, uraniums[i].p.x, height);
-
-        for(let i = 0; i < rows; i++)
-            line(0, uraniums[i * columns].p.y, width, uraniums[i * columns].p.y);
+function keyPressed(){
+    if(keyCode === 68){     //D Key
+        debug = !debug;
     }
+}
+
+function showGrid(){
+    push();
+    fill(0)
+    text(mouseX + ", " + mouseY, mouseX + 10, mouseY - 10)
+
+    stroke(255, 0, 0);
+    line(0, mouseY, width, mouseY);
+    line(mouseX, 0, mouseX, height);
+
+    stroke(0)
+    for(let i = 0; i < columns; i++)
+        line(uraniums[i].p.x, 0, uraniums[i].p.x, height);
+
+    for(let i = 0; i < rows; i++)
+        line(0, uraniums[i * columns].p.y, width, uraniums[i * columns].p.y);
     pop();
 }
