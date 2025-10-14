@@ -1,6 +1,6 @@
 const FPS = 60;
 
-let i = 500;
+let i = 400;
 let scale;
 
 let wheelRadius = 150;
@@ -31,15 +31,14 @@ function draw(){
 
     let dx = (bikeFrameLength + 2 * wheelRadius) * scale / 2
 
-    translate(width / 2 - sqrt(1 - scale) * 500, height / 2);
+    translate(width / 2 - sqrt(1 - scale) * 500, height / 2 + 100);
     drawWheel(-dx);
     drawWheel(dx);
-
 
     i--;
 
     if(i <= 60) {
-        i = 500;
+        i = 400;
         once = true;
     }
 
