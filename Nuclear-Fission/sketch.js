@@ -9,7 +9,7 @@ let verticalOffset;
 
 const nucleusRadius = 13;
 const neutronRadius = 5;
-const neutronSpeed = 6 / (FPS / 30);
+const neutronSpeed = 8 / (FPS / 30);
 
 let neutrons = [];
 let nuclei = [];
@@ -27,6 +27,11 @@ const nucleusTypes = {
 }
 const {NON_FISSILE, URANIUM, XENON} = nucleusTypes;
 
+const instructions = [
+    "Click anywhere on the screen to activate sound",
+    "Press C to clear the screen",
+    "Press S to spawn a neutron",
+]
 
 function preload(){
     geigerSound = loadSound("sound/Geiger_1.wav");
@@ -34,6 +39,14 @@ function preload(){
 
 function staticSetup(){
     push();
+
+    fill(80);
+    textAlign(LEFT);
+    textSize(16);
+    for(let i = 0; i < instructions.length; i++)
+        text(instructions[i], 15, 8 + 22 * (i + 1));
+
+    fill(0)
     textSize(20);
     textAlign(RIGHT, CENTER);
     text(neutrons.length + " neutrons", width - 25, 35);
@@ -131,9 +144,9 @@ class Nucleus {
         circle(this.p.x, this.p.y, this.radius * 2);
 
         if(this.type === NON_FISSILE){
-            let probUranium = (1 - pow(1 - 0.00011, 30 / FPS));
+            let probUranium = (1 - pow(1 - 0.00035, 30 / FPS));
             let probXenon = (1 - pow(1 - 0.00004, 30 / FPS));
-            let probNeutron = (1 - pow(1 - 0.00001, 30 /FPS));
+            let probNeutron = (1 - pow(1 - 0.00002, 30 /FPS));
 
             let r = random(0, 1);
 
