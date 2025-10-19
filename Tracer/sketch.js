@@ -1,58 +1,123 @@
-const FPS = 60;
-let ball;
-let gravity = 0.1;
-let vy = 0;
-let vx = 10;
-let cry = 1;
-let crx = 1;
+let img;
+let input;
+let drawing = false;
+let startX, startY;
+let squares = [];
+let snapDist = 10;
+let exportButton;
+let toolbar;
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    frameRate(FPS);
+    // Create toolbar div
+    toolbar = createDiv();
+    toolbar.style('margin', '10px');
+    toolbar.style('display', 'flex');
+    toolbar.style('gap', '10px');
+    toolbar.style('align-items', 'center');
 
-    if(navigator.userAgent.match(/iPhone|iPad|iPod|Android|webOs|BlackBerry|Windows Phone/i))
-        pixelDensity(1);
+    // Upload button
+    input = createFileInput(handleFile);
+    input.parent(toolbar);
 
-    ball = new Ball(width / 2, height / 2 - 100, 20);
+    // Export button
+    exportButton = createButton('Save Code to File');
+    exportButton.parent(toolbar);
+    exportButton.mousePressed(saveCodeToFile);
+
+    // Create initial canvas
+    createCanvas(800, 600);
+    background(220);
+    textAlign(CENTER, CENTER);
+    text('Upload an image to begin', width / 2, height / 2);
+}
+
+function handleFile(file) {
+    if (file.type === 'image') {
+        img = loadImage(file.data, () => {
+            resizeCanvas(img.width, img.height);
+            image(img, 0, 0);
+        });
+    }
 }
 
 function draw() {
-    background(220);
-    vy += gravity;
-    ball.y += vy;
+    if (img) {
+        image(img, 0, 0);
 
-    ball.x += vx;
+        // Draw all saved squares
+        noStroke();
+        for (let s of squares) {
+            fill(s.color);
+            rect(s.x, s.y, s.w, s.h);
+        }
 
-    if(ball.x + ball.radius >= width){
-        vx = -vx * crx;
-        ball.x = width - ball.radius;
-        ball.x += vx;
+        // Draw current preview
+        if (drawing) {
+            let { snappedX, snappedY } = getSnapped(mouseX, mouseY);
+            let w = snappedX - startX;
+            let h = snappedY - startY;
+            noFill();
+            stroke(0, 255, 0);
+            rect(startX, startY, w, h);
+        }
     }
-
-    if(ball.x - ball.radius <= 0){
-        vx = -vx * crx;
-        ball.x = ball.radius;
-        ball.x += vx;
-    }
-
-
-    if (ball.y + ball.radius >= height) {
-        vy = -vy * cry;
-        ball.y = height - ball.radius;
-        ball.y += vy;
-    }
-
-    ball.display();
 }
 
-class Ball {
-    constructor(x, y, radius) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
+function mousePressed() {
+    if (img && mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+        let snapped = getSnapped(mouseX, mouseY);
+        startX = snapped.snappedX;
+        startY = snapped.snappedY;
+        drawing = true;
+    }
+}
+
+function mouseReleased() {
+    if (drawing) {
+        let snapped = getSnapped(mouseX, mouseY);
+        let w = snapped.snappedX - startX;
+        let h = snapped.snappedY - startY;
+
+        // Color at rectangle center
+        let centerX = startX + w / 2;
+        let centerY = startY + h / 2;
+        let c = img.get(centerX, centerY);
+
+        squares.push({ x: startX, y: startY, w, h, color: c });
+        drawing = false;
+    }
+}
+
+// 🧲 Snap helper
+function getSnapped(x, y) {
+    let snappedX = x;
+    let snappedY = y;
+
+    for (let s of squares) {
+        let edgesX = [s.x, s.x + s.w];
+        let edgesY = [s.y, s.y + s.h];
+
+        for (let ex of edgesX) if (abs(x - ex) < snapDist) snappedX = ex;
+        for (let ey of edgesY) if (abs(y - ey) < snapDist) snappedY = ey;
+    }
+    return { snappedX, snappedY };
+}
+
+// 💾 Save the generated code as a text file
+function saveCodeToFile() {
+    let code = "// Generated p5.js sketch\n";
+    code += "function setup() {\n";
+    code += "  createCanvas(" + width + ", " + height + ");\n";
+    code += "  noStroke();\n\n";
+
+    for (let s of squares) {
+        let r = int(red(s.color));
+        let g = int(green(s.color));
+        let b = int(blue(s.color));
+        code += `  fill(${r}, ${g}, ${b});\n`;
+        code += `  rect(${int(s.x)}, ${int(s.y)}, ${int(s.w)}, ${int(s.h)});\n\n`;
     }
 
-    display() {
-        ellipse(this.x, this.y, this.radius * 2);
-    }
+    code += "}\n";
+    saveStrings([code], "traced_rects.js");
 }

@@ -1,0 +1,19 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+canvas {
+    display: block;
+}
+
+/* Add style to checkRedWhenCollide checkbox */
+#checkRedWhenCollide {
+    font-family: halvetica, serif;
+}
+
+.prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
