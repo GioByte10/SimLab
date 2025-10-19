@@ -4,7 +4,7 @@ let tiles = [];
 let l = 50;
 let animationFrameCount = 2 * FPS;
 
-let trip = false;
+let mode = 0;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -70,6 +70,7 @@ class Tile {
         this.colors = [color(random(255), random(255), random(255)), color(random(255), random(255), random(255)), color(random(255), random(255), random(255))];
         this.newColors = [color(random(255), random(255), random(255)), color(random(255), random(255), random(255)), color(random(255), random(255), random(255))];
         this.startColors = this.colors;
+
     }
 
     squares(){
@@ -108,55 +109,53 @@ class Tile {
         push();
         translate(this.x, this.y);
 
-        fill(trip ? color(random(255), random(255), random(255)) : this.colors[0]);
+        fill(mode === 1 ? color(random(255), random(255), random(255)) : this.colors[0]);
         hexagon(0, 0, this.l);
 
-        fill(trip ? color(random(255), random(255), random(255)) : this.colors[1]);
+        fill(mode === 1 ? color(random(255), random(255), random(255)) : this.colors[1]);
         this.squares();
 
-        fill(trip ? color(random(255), random(255), random(255)) : this.colors[2]);
+        fill(mode === 1 ? color(random(255), random(255), random(255)) : this.colors[2]);
         this.triangles();
 
-        if(!(frameCount % (animationFrameCount))) {
-            this.newColors = [color(random(255), random(255), random(255)), color(random(255), random(255), random(255)), color(random(255), random(255), random(255))];
-            this.startColors = this.colors;
-            this.animationStart = frameCount;
+        if(mode !== 1) {
+            if (!(frameCount % animationFrameCount)) {
+                this.newColors = [color(random(255), random(255), random(255)), color(random(255), random(255), random(255)), color(random(255), random(255), random(255))];
+                this.animationStart = frameCount;
+
+                if(mode === 2)
+                    this.startColors = this.colors.map(c => color(red(c), green(c), blue(c)));
+
+                else
+                    this.startColors = this.colors;
+
+            }
+
+            for (let i = 0; i < 3; i++) {
+                let r = red(this.startColors[i]);
+                let g = green(this.startColors[i]);
+                let b = blue(this.startColors[i]);
+
+                r = r + (red(this.newColors[i]) - r) * (frameCount - this.animationStart) / animationFrameCount;
+                g = g + (green(this.newColors[i]) - g) * (frameCount - this.animationStart) / animationFrameCount;
+                b = b + (blue(this.newColors[i]) - b) * (frameCount - this.animationStart) / animationFrameCount;
+
+                this.colors[i] = color(r, g, b);
+            }
         }
-
-        for(let i = 0; i < 3; i++){
-            let r = red(this.startColors[i]);
-            let g = green(this.startColors[i]);
-            let b = blue(this.startColors[i]);
-
-            //console.log((frameCount - this.animationStart) / animationFrameCount);
-
-            r = r + (red(this.newColors[i]) - r) * (frameCount - this.animationStart) / animationFrameCount;
-            g = g + (green(this.newColors[i]) - g) * (frameCount - this.animationStart) / animationFrameCount;
-            b = b + (blue(this.newColors[i]) - b) * (frameCount - this.animationStart) / animationFrameCount;
-
-            this.colors[i] = color(r, g, b);
-        }
-
-
-
-        // for(let i = 0; i < 3; i++){
-        //     let r = red(this.colors[i]);
-        //     let g = green(this.colors[i]);
-        //     let b = blue(this.colors[i]);
-        //
-        //     r += int(random(2)) * 2 - 1;
-        //     g += int(random(2)) * 2 - 1;
-        //     b += int(random(2)) * 2 - 1;
-        //
-        //     this.colors[i] = color(r, g, b)
-        // }
 
         pop();
     }
 }
 
 function keyPressed(){
-    if(keyCode === 84){     // t key
-        trip = !trip;
+    if(keyCode === 69){         // e key
+        mode = (mode === 1 ? 0 : 1)
+    }
+    else if(keyCode === 84){    // t key
+        mode = (mode === 2 ? 0 : 2);
+    }
+    else if(keyCode === 78){    // n key
+        mode = 0;
     }
 }
